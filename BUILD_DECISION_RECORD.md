@@ -80,12 +80,22 @@ Python 3.11+ 标准库、`src/` package layout、`unittest`、JSONL ledger、dat
 
 ## Explicitly not building
 
-不做 Sprint 02；不做真实视频生成、Prompt 编排、Shot QA、Final Assembly、队列/并发、数据库、真实 Agent 网关、服务端文件上传、真实鉴权实现、支付、云存储、外部分享接口、真实大模型 API 调用、API Key 持久化、hall 播放器和 analytics dashboard。二维码接入只做到本地 mock handshake 与真实网关契约，不声称已连接当前 Codex 对话。
+不做 Sprint 02；不做真实视频生成、Prompt 编排、Shot QA、Final Assembly、队列/并发、数据库、真实 Agent 网关、外部服务端文件上传、真实鉴权实现、支付、云存储、外部分享接口、真实大模型 API 调用、API Key 持久化、hall 播放器和 analytics dashboard。二维码接入只做到本地 mock handshake 与真实网关契约；品牌素材上传只属于本机后台，不声称已连接当前 Codex 对话。
 
 ## WebUI generation-return addendum
 
 本次用户需求将 WebUI 的最小闭环从“浏览器模拟进度”改善为“本地提交 → 本地渲染 → 当前页面回传”。决策分类为 **Improve**：保留原有普通用户交互，不引入数据库、队列或云 provider，只增加一个本地 generation endpoint、受限的本地 MP4 renderer、幂等键和按访客/日期的额度保护。
 
-- Success evidence：文字请求 `201` 并返回 `video_url` / `download_url`；视频端点返回 `video/mp4`；同一访客第二次返回 `429 DAILY_VIDEO_LIMIT`；三张图片请求返回 `400`。
+- Success evidence：文字请求 `201` 并返回 `video_url` / `download_url`；视频端点返回 `video/mp4`；三张参考图请求返回 `400`；额度与积分规则由新增测试覆盖。
 - Data boundary：文字、图片和生成资产留在本机 `.local/`；接口响应不回显原始输入；公开仓库不包含运行时生成文件、访客内容或 API Key。
 - Explicit boundary：当前视频是本地 deterministic demo renderer，不声称是真实 AI 视频生成；真实 provider、生产身份、跨设备额度和云端回传继续不做。
+
+## Free allowance, model pricing, and exhibitor branding addendum
+
+本次需求继续分类为 **Improve**：复用本地生成、额度和 QR 控制台，只增加三条可替换规则——免费额度、模型计价与展位品牌层。
+
+- Free grant：每个本地访客按本机日期获得 1 支视频和 2 张输出图片；额外输出从绑定展位的本地积分账户扣减。
+- Model boundary：模型目录声明每支视频和每张图片的积分单价；当前两个模型仍调用本地 demo renderer，真实大模型只允许通过既有 provider adapter 接入。
+- Brand boundary：QR 后台保存 Logo/展板到本机品牌资产目录；渲染层用 `ImageOps.contain` 和 alpha composite，保持原始宽高比，并在 PNG/MP4 两类输出中复用同一品牌帧。
+- Success evidence：免费请求 `credits_charged=0` 且返回 1 个视频地址和 2 个图片地址；积分充值后额外请求按模型扣费；QR 返回 `brand_ready=true`；三张参考图仍被拒绝。
+- Explicitly not building：真实支付、充值渠道、生产账户认证、跨设备钱包、云端大模型调用和品牌素材公开发布。

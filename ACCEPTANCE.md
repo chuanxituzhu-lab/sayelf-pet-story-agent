@@ -17,7 +17,7 @@ $env:PYTHONPATH = "src"
 python -m unittest discover -s tests -v
 ```
 
-Result: **8 tests passed**.
+Result: **11 tests passed**.
 
 Covered evidence:
 
@@ -75,17 +75,18 @@ Open → enter/default pet description → choose mode/ratio → Generate
 
 The page is intentionally a local demo surface. It creates a deterministic local MP4 through the local renderer and does not claim to use a real AI video provider.
 
-## Local video return and quota check
+## Local video return, free allowance, credits, and branding check
 
 Verified against `python webui/server.py`:
 
-- Text-only submission returned HTTP `201`, `returned_to_user: true`, a `video_url`, and a `download_url`.
-- The returned video endpoint served HTTP `200` with `Content-Type: video/mp4`; download mode returned an attachment filename.
-- A second successful submission for the same local visitor returned HTTP `429` with `DAILY_VIDEO_LIMIT`.
-- A request containing three images returned HTTP `400`; the accepted maximum is two images.
-- The response exposes only generation status, playback/download URLs, and quota counters; submitted text and image bytes are not echoed.
+- Text-only submission with the defaults returned HTTP `201`, one `video_url`, two `image_urls`, and `credits_charged: 0`.
+- The returned video endpoint served HTTP `200` with `Content-Type: video/mp4`; generated image endpoints served HTTP `200` with `Content-Type: image/png`.
+- The control desk granted 24 local credits to the booth; a second request for two videos and four images returned two video URLs, four image URLs, and `credits_charged: 24` under the selected model.
+- The QR generation request accepted a Logo and board asset; its response reported `brand_ready: true`, and the rendered assets were produced with aspect-ratio-preserving contain placement.
+- A request containing three reference images returned HTTP `400`; the accepted input maximum remains two reference images.
+- The response exposes status, asset URLs, counts, and quota/billing counters; submitted text and image bytes are not echoed.
 
-The local limit is a demo guard keyed by a browser-local visitor id. It is not production authentication or a cross-device identity system.
+The local free allowance is a demo guard keyed by a browser-local visitor id, while paid credits are held against the booth account. This is not production authentication, payment processing, or a cross-device identity system.
 
 ## Prompt board check
 

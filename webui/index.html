@@ -314,6 +314,9 @@
       .error-message { min-height: 19px; margin: 9px 0 0; color: var(--coral); font-size: 13px; }
       .quota-hint, .quota-status { margin: 10px 0 0; color: var(--soft); font-size: 12px; line-height: 1.5; }
       .quota-status { color: var(--mint); font-weight: 700; }
+      .output-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+      .output-grid label { display: grid; gap: 6px; color: var(--soft); font-size: 12px; font-weight: 700; }
+      .output-grid select { width: 100%; min-height: 40px; border: 1px solid var(--line); border-radius: 10px; background: rgba(4, 12, 24, .38); color: var(--ink); padding: 7px 9px; }
 
       .result-card { min-height: 570px; padding: 25px; overflow: hidden; }
 
@@ -363,6 +366,9 @@
       .video-return-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
       .video-return-actions a { color: var(--mint); font-size: 13px; font-weight: 800; text-decoration: none; }
       .video-return-actions span { color: var(--soft); font-size: 12px; }
+      .generated-images { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin: 10px 0 0; }
+      .generated-images[hidden] { display: none; }
+      .generated-images img { width: 100%; max-height: 190px; border-radius: 10px; background: #050b15; object-fit: contain; }
 
       .storyboard-card { grid-column: 1 / -1; padding: 25px; }
       .storyboard-card[hidden] { display: none; }
@@ -589,6 +595,10 @@
               </label>
             </div>
 
+            <div class="output-grid">
+              <label id="videoOutputLabel" for="videoOutputCount"><span id="videoOutputLabelText">视频数量</span><select id="videoOutputCount"><option value="1">1 支</option><option value="2">2 支</option><option value="3">3 支</option></select></label>
+              <label id="imageOutputLabel" for="imageOutputCount"><span id="imageOutputLabelText">图片数量</span><select id="imageOutputCount"><option value="2">2 张</option><option value="4">4 张</option><option value="6">6 张</option><option value="8">8 张</option></select></label>
+            </div>
             <p id="generationQuotaHint" class="quota-hint">每天可生成 1 次视频；本次最多 2 张图片。</p>
             <button id="generateButton" class="primary-button" type="button">生成我的宠物电影&nbsp; →</button>
           </div>
@@ -630,6 +640,7 @@
             </div>
             <div id="videoReturn" class="video-return" hidden>
               <video id="resultVideo" controls playsinline preload="metadata"></video>
+              <div id="generatedImages" class="generated-images" hidden></div>
               <div class="video-return-actions">
                 <a id="downloadVideoLink" href="#" download>下载视频</a>
                 <span id="videoReturnStatus"></span>
@@ -800,7 +811,7 @@
           progressAria: "生成进度", sceneAria: "故事镜头", successReady: "已准备好", preview: "预览故事", again: "再生成一次",
           storyboardStep: "03 / PROMPT BOARD", storyboardTitle: "图片与视频分镜", storyboardDescription: "每个故事节点对应一张图片和一条视频分镜，顺序保持一致。",
           countImages: "张图片", countVideos: "条视频分镜", copyVideo: "复制全部视频分镜 Prompt", imagePrompt: "图片 Prompt", videoPrompt: "视频分镜 Prompt", copy: "复制", copyAll: "汇总复制", videoNote: "视频分镜支持一次性汇总复制；图片 Prompt 可按单张复制。",
-          quotaHint: "每天可生成 1 次视频；本次最多 2 张图片。", quotaStatus: "今日视频 {videosUsed}/{videoLimit} · 图片 {imagesUsed}/{imageLimit}", videoReturned: "后台已生成并回传视频", downloadVideo: "下载视频", dailyVideoLimit: "今天的视频已生成，请明天再来。", dailyImageLimit: "今天最多可以使用 2 张图片。", generationServerError: "后台生成失败，请稍后重试。",
+          outputVideoLabel: "视频数量", outputImageLabel: "图片数量", outputVideoUnit: "支", outputImageUnit: "张", quotaHint: "每天免费 1 支视频和 2 张图片；超出后按模型和积分计费。", quotaStatus: "今日免费额度：视频 {freeVideosUsed}/{videoLimit} · 图片 {freeImagesUsed}/{imageLimit} · 积分 {credits}", videoReturned: "后台已生成并回传视频", downloadVideo: "下载视频", dailyVideoLimit: "今天的免费 1 支视频额度已用完；如需继续请使用积分。", dailyImageLimit: "今天的免费 2 张图片额度已用完；如需继续请使用积分。", insufficientCredits: "积分不足，请联系后台增加积分。", generationServerError: "后台生成失败，请稍后重试。",
           footerPilot: "Pet Expo Pilot 01 本地演示", descriptionError: "写一句宠物描述或拍摄一张照片，再开始生成。", imageCopied: "图片 Prompt 已复制", videoCopied: "全部视频分镜 Prompt 已复制", copyFailed: "复制没有成功，请手动选择 Prompt 文本。", previewDemo: "视频已经回传到当前页面，可直接播放或下载。",
           photoSelected: "已选择图片：{name}", photoReady: "图片已准备好：{name}", qrRead: "已读取二维码：{value}", qrNoCode: "没有识别到二维码，请重试。", qrFallback: "二维码入口已打开；当前浏览器需要使用支持扫码的相机或二维码图片。",
           apiStep: "MODEL CONNECTION", apiTitle: "大模型 API 接入", apiDescription: "配置生成服务的入口，当前只保存在本页。", apiNote: "本地演示不会上传或保存 API Key，也不会自动调用外部服务。",
@@ -824,7 +835,7 @@
           progressAria: "Generation progress", sceneAria: "Story shots", successReady: "Ready to view", preview: "Preview story", again: "Generate again",
           storyboardStep: "03 / PROMPT BOARD", storyboardTitle: "Image and video storyboard", storyboardDescription: "Each story beat has one image and one video shot, kept in the same order.",
           countImages: "images", countVideos: "video shots", copyVideo: "Copy all video storyboard Prompts", imagePrompt: "Image Prompt", videoPrompt: "Video storyboard Prompt", copy: "Copy", copyAll: "Included in summary", videoNote: "Copy all video storyboard Prompts at once; copy image Prompts one by one.",
-          quotaHint: "One video per day; up to 2 images in this request.", quotaStatus: "Today: videos {videosUsed}/{videoLimit} · images {imagesUsed}/{imageLimit}", videoReturned: "Video generated and returned by the backend", downloadVideo: "Download video", dailyVideoLimit: "Today's video is already generated. Please come back tomorrow.", dailyImageLimit: "Up to 2 images can be used today.", generationServerError: "Backend generation failed. Please try again.",
+          outputVideoLabel: "Video quantity", outputImageLabel: "Image quantity", outputVideoUnit: "video(s)", outputImageUnit: "image(s)", quotaHint: "1 free video and 2 free images per day; extras use model-priced credits.", quotaStatus: "Today's free allowance: videos {freeVideosUsed}/{videoLimit} · images {freeImagesUsed}/{imageLimit} · credits {credits}", videoReturned: "Video generated and returned by the backend", downloadVideo: "Download video", dailyVideoLimit: "Today's free video is used; continue with credits.", dailyImageLimit: "Today's free 2-image allowance is used; continue with credits.", insufficientCredits: "Not enough credits. Ask the control desk to add credits.", generationServerError: "Backend generation failed. Please try again.",
           footerPilot: "Pet Expo Pilot 01 · Local demo", descriptionError: "Add a pet description or take a photo before generating.", imageCopied: "Image Prompt copied", videoCopied: "All video storyboard Prompts copied", copyFailed: "Copy did not succeed. Please select the Prompt text manually.", previewDemo: "The video has been returned to this page and can be played or downloaded.",
           photoSelected: "Photo selected: {name}", photoReady: "Photo ready: {name}", qrRead: "QR code read: {value}", qrNoCode: "No QR code found. Please try again.", qrFallback: "The QR entry is open; this browser needs a camera or QR image scanner that supports detection.",
           apiStep: "MODEL CONNECTION", apiTitle: "Connect a model API", apiDescription: "Configure a generation service entry; it stays on this page for now.", apiNote: "This local demo does not upload or save an API key and will not call an external service automatically.",
@@ -856,7 +867,7 @@
           eyebrow: "eyebrow", introCopy: "introCopy", scanQrTitle: "scanQrTitle", scanQrHint: "scanQrHint", photoTitle: "photoTitle", photoHint: "photoHint",
           petSectionStep: "petSectionStep", petSectionTitle: "petSectionTitle", localDemo: "localDemoBadge", petLabel: "petDescriptionLabel",
           modeLabel: "modeLabel", modeHint: "modeHint", ratioLabel: "ratioLabel", ratioHint: "ratioHint", consentTitle: "consentTitle", consentHint: "consentHint", petLabel: "petDescriptionLabelText",
-          resultStep: "resultStep", resultTitle: "result-title", resultDescription: "resultDescription", readyTitle: "readyTitle", readyCopy: "readyCopy", generationQuotaHint: "generationQuotaHint",
+          resultStep: "resultStep", resultTitle: "result-title", resultDescription: "resultDescription", readyTitle: "readyTitle", readyCopy: "readyCopy", generationQuotaHint: "generationQuotaHint", videoOutputLabel: "videoOutputLabelText", imageOutputLabel: "imageOutputLabelText",
           storyboardStep: "storyboardStep", storyboardTitle: "storyboardTitle", storyboardDescription: "storyboardDescription",
           copyVideo: "copyVideoPromptsButton", videoNote: "videoSummaryNote", footerBrand: "footerBrand", footerPilot: "footerPilot",
           apiStep: "apiModalStep", apiTitle: "apiModalTitle", apiDescription: "apiModalDescription", apiNote: "apiNote", apiProvider: "apiProviderLabel",
@@ -871,6 +882,12 @@
         $("modeCinematic").innerHTML = "<strong>" + t("cinematic") + "</strong><span>" + t("cinematicHint") + "</span>";
         $("ratioPortrait").innerHTML = "<strong>" + t("portrait") + "</strong><span>" + t("portraitHint") + "</span>";
         $("ratioLandscape").innerHTML = "<strong>" + t("landscape") + "</strong><span>" + t("landscapeHint") + "</span>";
+        const selectedVideoCount = $("videoOutputCount").value || "1";
+        const selectedImageCount = $("imageOutputCount").value || "2";
+        $("videoOutputCount").innerHTML = [1, 2, 3].map(function (value) { return '<option value="' + value + '">' + value + " " + t("outputVideoUnit") + "</option>"; }).join("");
+        $("imageOutputCount").innerHTML = [2, 4, 6, 8].map(function (value) { return '<option value="' + value + '">' + value + " " + t("outputImageUnit") + "</option>"; }).join("");
+        $("videoOutputCount").value = selectedVideoCount;
+        $("imageOutputCount").value = selectedImageCount;
         ["story1", "story2", "story3", "story4", "story5"].forEach(function (key, index) { $("storyChip" + (index + 1)).textContent = t(key); });
         $("consentLabel").setAttribute("aria-label", t("consentAria"));
         $("progressBar").setAttribute("aria-label", t("progressAria"));
@@ -1084,6 +1101,7 @@
         window.setTimeout(function () {
           state.session.status = "connected";
           renderSession();
+          loadQuota();
           showToast(t("sessionConnected"));
         }, 420);
       }
@@ -1234,7 +1252,10 @@
             input_text: inputText,
             images: images,
             aspect_ratio: state.ratio,
-            mode: state.mode
+            mode: state.mode,
+            booth_code: state.session.joinCode && state.session.joinCode.booth ? state.session.joinCode.booth : "A17",
+            video_count: Number($("videoOutputCount").value || 1),
+            image_count: Number($("imageOutputCount").value || 2)
           })
         });
         const payload = await response.json();
@@ -1248,7 +1269,8 @@
 
       async function loadQuota() {
         try {
-          const response = await fetch("/api/generation/quota?visitor_id=" + encodeURIComponent(state.visitorId));
+          const boothCode = state.session.joinCode && state.session.joinCode.booth ? state.session.joinCode.booth : "A17";
+          const response = await fetch("/api/generation/quota?visitor_id=" + encodeURIComponent(state.visitorId) + "&booth_code=" + encodeURIComponent(boothCode));
           if (!response.ok) return;
           state.quota = await response.json();
           renderQuota();
@@ -1260,12 +1282,12 @@
       function renderQuota() {
         if (!state.quota) return;
         $("quotaStatus").textContent = t("quotaStatus", {
-          videosUsed: state.quota.videos_used,
+          freeVideosUsed: state.quota.free_videos_used,
           videoLimit: state.quota.video_limit,
-          imagesUsed: state.quota.images_used,
-          imageLimit: state.quota.image_limit
+          freeImagesUsed: state.quota.free_images_used,
+          imageLimit: state.quota.image_limit,
+          credits: state.quota.credits
         });
-        if (!state.generating && !state.completed) $("generateButton").disabled = state.quota.videos_remaining <= 0;
       }
 
       async function startGeneration() {
@@ -1275,10 +1297,6 @@
         if (!description && !hasImages) {
           $("descriptionError").textContent = t("descriptionError");
           $("petDescription").focus();
-          return;
-        }
-        if (state.quota && state.quota.videos_remaining <= 0) {
-          $("descriptionError").textContent = t("dailyVideoLimit");
           return;
         }
         const button = $("generateButton");
@@ -1318,7 +1336,7 @@
           button.disabled = false;
           button.innerHTML = t("generate");
           const code = error.payload && error.payload.error;
-          $("descriptionError").textContent = code === "DAILY_VIDEO_LIMIT" ? t("dailyVideoLimit") : code === "DAILY_IMAGE_LIMIT" ? t("dailyImageLimit") : t("generationServerError");
+          $("descriptionError").textContent = code === "DAILY_VIDEO_LIMIT" ? t("dailyVideoLimit") : code === "DAILY_IMAGE_LIMIT" ? t("dailyImageLimit") : code === "INSUFFICIENT_CREDITS" ? t("insufficientCredits") : t("generationServerError");
           if (error.payload && error.payload.quota) {
             state.quota = error.payload.quota;
             renderQuota();
@@ -1341,6 +1359,9 @@
         $("downloadVideoLink").href = result.download_url;
         $("videoReturnStatus").textContent = t("videoReturned");
         $("videoReturn").hidden = false;
+        const generatedImages = $("generatedImages");
+        generatedImages.innerHTML = (result.image_urls || []).map(function (url, index) { return '<img src="' + url + '" alt="Generated pet image ' + (index + 1) + '" />'; }).join("");
+        generatedImages.hidden = !(result.image_urls && result.image_urls.length);
         renderScenes();
         renderStoryboard();
         $("storyboardPanel").hidden = false;
@@ -1372,6 +1393,8 @@
         state.completed = false;
         state.lastGeneration = null;
         $("videoReturn").hidden = true;
+        $("generatedImages").hidden = true;
+        $("generatedImages").innerHTML = "";
         $("resultVideo").removeAttribute("src");
         setState("readyState");
         $("storyboardPanel").hidden = true;

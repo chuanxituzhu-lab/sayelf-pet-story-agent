@@ -25,7 +25,8 @@ class GenerationLimitTests(unittest.TestCase):
 
         existing, error = server.reserve_quota(self.visitor_id, 0, "request-2")
         self.assertIsNone(existing)
-        self.assertEqual(error["error"], "DAILY_VIDEO_LIMIT")
+        self.assertEqual(error["error"], "INSUFFICIENT_CREDITS")
+        self.assertGreater(error["required_credits"], 0)
 
     def test_idempotency_returns_no_second_reservation(self):
         server.reserve_quota(self.visitor_id, 1, "same-request")
@@ -34,6 +35,18 @@ class GenerationLimitTests(unittest.TestCase):
         self.assertEqual(existing["generation_id"], "video-test")
         self.assertIsNone(error)
         self.assertEqual(server.quota_snapshot(self.visitor_id)["videos_used"], 1)
+
+    def test_extra_video_uses_model_credits_after_free_allowance(self):
+        account_key = "test-booth-" + uuid.uuid4().hex
+        server.BILLING_REGISTRY[account_key] = {"credits": 4}
+        server.reserve_generation(self.visitor_id, 1, 2, server.DEFAULT_MODEL_ID, account_key, "free-request")
+        existing, error, reservation = server.reserve_generation(self.visitor_id, 1, 0, server.DEFAULT_MODEL_ID, account_key, "paid-request")
+        self.assertIsNone(existing)
+        self.assertIsNone(error)
+        self.assertEqual(reservation["credits"], 4)
+        self.assertEqual(server.billing_snapshot(account_key)["credits"], 0)
+        server.release_generation(self.visitor_id, reservation)
+        server.BILLING_REGISTRY.pop(account_key, None)
 
 
 if __name__ == "__main__":
