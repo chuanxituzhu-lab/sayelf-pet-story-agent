@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sayelf-pet-story-agent"
+version = "0.1.0"
+description = "SAYELF Pet Story Agent Build 0.1 Sprint 01 local-first modular monolith"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["src"]

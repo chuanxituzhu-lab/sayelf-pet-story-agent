@@ -1,0 +1,1363 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1220" />
+    <meta
+      name="description"
+      content="Pet FDE · My Pet Movie 本地演示界面"
+    />
+    <title>Pet FDE · My Pet Movie</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23131e32'/%3E%3Cpath d='M18 39c0-9 6-15 14-15s14 6 14 15c0 5-4 8-8 8-3 0-4-3-6-3s-3 3-6 3c-4 0-8-3-8-8Zm5-14c-5-2-7-6-5-9 2-2 6-1 8 3 1 3 0 5-3 6Zm18 0c-3-1-4-3-3-6 2-4 6-5 8-3 2 3 0 7-5 9ZM27 38c2 2 8 2 10 0" fill='none' stroke='%2399f6c6' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #f3f7fb;
+        --muted: #9aa8bc;
+        --soft: #6f7f96;
+        --surface: #121d31;
+        --surface-2: #17243a;
+        --line: rgba(188, 205, 230, 0.14);
+        --mint: #99f6c6;
+        --mint-dark: #0b2b25;
+        --coral: #ff9b7d;
+        --navy: #0b1220;
+        --shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+      }
+
+      * { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+
+      body {
+        min-width: 320px;
+        margin: 0;
+        background:
+          radial-gradient(circle at 14% 4%, rgba(61, 116, 125, 0.23), transparent 27rem),
+          radial-gradient(circle at 95% 18%, rgba(151, 72, 65, 0.17), transparent 24rem),
+          var(--navy);
+        color: var(--ink);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+        line-height: 1.5;
+      }
+
+      button, textarea { font: inherit; }
+
+      button { cursor: pointer; }
+
+      .app-shell { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 78px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .brand { display: flex; align-items: center; gap: 12px; }
+
+      .brand-mark {
+        display: grid;
+        width: 44px;
+        height: 44px;
+        place-items: center;
+        border: 1px solid rgba(153, 246, 198, 0.45);
+        border-radius: 50%;
+        background: #030605;
+        object-fit: cover;
+        box-shadow: 0 0 0 4px rgba(153, 246, 198, 0.06);
+      }
+
+      .brand-name { font-weight: 800; letter-spacing: 0.02em; }
+      .brand-subtitle { color: var(--soft); font-size: 12px; }
+      .topbar-actions { display: flex; align-items: center; gap: 9px; }
+      .language-button, .api-button, .qr-admin-button { min-height: 36px; border: 1px solid var(--line); border-radius: 10px; background: rgba(4, 12, 24, 0.36); color: #dce5f0; font-size: 13px; font-weight: 800; padding: 8px 12px; }
+      .language-button:hover, .api-button:hover, .qr-admin-button:hover { border-color: rgba(153, 246, 198, 0.55); color: var(--mint); }
+      .api-button { border-color: rgba(255, 155, 125, 0.28); color: #ffd0c2; }
+      .qr-admin-button { border-color: rgba(153, 246, 198, 0.28); color: #ccefe0; }
+
+      .pilot-badge, .quiet-badge, .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        padding: 8px 11px;
+      }
+
+      .pilot-badge::before, .status-pill::before {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--mint);
+        box-shadow: 0 0 0 4px rgba(153, 246, 198, 0.1);
+        content: "";
+      }
+
+      main {
+        display: grid;
+        grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+        gap: 22px;
+        padding: 42px 0 54px;
+      }
+
+      .eyebrow {
+        margin: 0 0 17px;
+        color: var(--mint);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.16em;
+      }
+
+      h1, h2, p { margin-top: 0; }
+
+      h1 {
+        max-width: 630px;
+        margin-bottom: 18px;
+        font-size: clamp(2.7rem, 7vw, 5.8rem);
+        letter-spacing: -0.065em;
+        line-height: 0.98;
+      }
+
+      h1 span { color: var(--mint); }
+
+      .intro-copy {
+        max-width: 520px;
+        margin-bottom: 32px;
+        color: var(--muted);
+        font-size: 17px;
+      }
+
+      .story-strip {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        max-width: 580px;
+      }
+
+      .story-chip {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: #c6d2e2;
+        font-size: 13px;
+        padding: 7px 10px;
+      }
+
+      .entry-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; max-width: 580px; margin-top: 20px; }
+      .entry-card { display: flex; align-items: center; gap: 11px; min-height: 72px; border: 1px solid var(--line); border-radius: 15px; background: rgba(18, 29, 49, 0.62); color: var(--ink); padding: 12px; text-align: left; transition: 160ms ease; }
+      .entry-card:hover { border-color: rgba(153, 246, 198, 0.55); background: rgba(23, 36, 58, 0.9); transform: translateY(-1px); }
+      .entry-icon { display: grid; width: 36px; height: 36px; flex: 0 0 auto; place-items: center; border-radius: 11px; background: rgba(153, 246, 198, 0.09); color: var(--mint); font-size: 18px; }
+      .entry-card:nth-child(2) .entry-icon { background: rgba(255, 155, 125, 0.1); color: var(--coral); }
+      .entry-copy { min-width: 0; }
+      .entry-copy strong { display: block; margin-bottom: 3px; font-size: 13px; }
+      .entry-copy span { display: block; color: var(--soft); font-size: 11px; line-height: 1.35; }
+      .entry-arrow { margin-left: auto; color: var(--soft); font-size: 16px; }
+      .entry-status { display: block; min-height: 18px; max-width: 580px; margin: 7px 2px 0; color: var(--soft); font-size: 12px; }
+      .file-input-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
+
+      .session-panel { max-width: 580px; margin-top: 16px; padding: 18px; }
+      .session-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 14px; }
+      .session-header h2 { font-size: 18px; }
+      .session-header p { max-width: 390px; margin: 6px 0 0; color: var(--soft); font-size: 12px; }
+      .session-status { border-color: rgba(188, 205, 230, 0.2); }
+      .session-status.is-verifying { color: #f5d890; }
+      .session-status.is-verifying::before { background: #f5d890; box-shadow: 0 0 0 4px rgba(245, 216, 144, 0.1); }
+      .session-status.is-connected { color: var(--mint); }
+      .session-status.is-error { color: var(--coral); }
+      .session-status.is-error::before { background: var(--coral); box-shadow: 0 0 0 4px rgba(255, 155, 125, 0.1); }
+      .session-empty { border: 1px dashed rgba(188, 205, 230, 0.17); border-radius: 13px; color: var(--soft); font-size: 12px; line-height: 1.55; padding: 12px; }
+      .session-connected[hidden], .session-empty[hidden] { display: none; }
+      .session-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; color: var(--muted); font-size: 12px; }
+      .session-meta strong { color: var(--mint); font-size: 13px; }
+      .session-composer { display: grid; gap: 9px; }
+      .session-composer textarea { min-height: 76px; font-size: 14px; }
+      .session-actions { display: flex; align-items: center; gap: 9px; }
+      .session-actions .secondary-button { flex: 0 0 auto; min-height: 40px; padding: 0 13px; }
+      .session-actions .primary-button { min-height: 40px; font-size: 13px; }
+      .attachment-chip { display: flex; align-items: center; justify-content: space-between; gap: 9px; border: 1px solid rgba(153, 246, 198, 0.22); border-radius: 10px; background: rgba(153, 246, 198, 0.06); color: #ccefe0; font-size: 12px; padding: 8px 10px; }
+      .attachment-chip[hidden] { display: none; }
+      .attachment-remove { border: 0; background: transparent; color: var(--soft); font-size: 16px; line-height: 1; padding: 0; }
+      .attachment-remove:hover { color: var(--coral); }
+      .session-hint, .session-message-state { min-height: 17px; margin: 0; color: var(--soft); font-size: 11px; }
+      .session-message-state { color: var(--mint); }
+      .session-log { display: grid; gap: 7px; max-height: 160px; margin-top: 13px; overflow: auto; padding-right: 3px; }
+      .session-message { border-radius: 12px; background: rgba(4, 12, 24, 0.32); color: #cbd7e6; font-size: 12px; line-height: 1.45; padding: 9px 10px; }
+      .session-message small { display: block; margin-bottom: 3px; color: var(--mint); font-size: 10px; font-weight: 800; letter-spacing: 0.08em; }
+
+      .surface {
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: linear-gradient(145deg, rgba(23, 36, 58, 0.94), rgba(15, 25, 43, 0.94));
+        box-shadow: var(--shadow);
+      }
+
+      .form-card { padding: 25px; }
+
+      .card-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .step-number {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--coral);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+      }
+
+      h2 { margin-bottom: 0; font-size: 22px; letter-spacing: -0.02em; }
+
+      .quiet-badge { color: var(--soft); white-space: nowrap; }
+
+      .field { margin-bottom: 21px; }
+
+      .field-label {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 9px;
+        color: #dce5f0;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .field-label small { color: var(--soft); font-size: 12px; font-weight: 500; }
+
+      textarea {
+        display: block;
+        width: 100%;
+        min-height: 100px;
+        resize: vertical;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        outline: none;
+        background: rgba(4, 12, 24, 0.34);
+        color: var(--ink);
+        font-size: 16px;
+        line-height: 1.6;
+        padding: 14px;
+        transition: border-color 160ms ease, box-shadow 160ms ease;
+      }
+
+      textarea:focus { border-color: rgba(153, 246, 198, 0.72); box-shadow: 0 0 0 4px rgba(153, 246, 198, 0.1); }
+
+      .choice-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+      .choice {
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        background: rgba(4, 12, 24, 0.26);
+        color: var(--muted);
+        padding: 12px 13px;
+        text-align: left;
+        transition: 160ms ease;
+      }
+
+      .choice:hover { border-color: rgba(153, 246, 198, 0.48); color: var(--ink); }
+      .choice[aria-pressed="true"] { border-color: var(--mint); background: var(--mint-dark); color: var(--mint); }
+      .choice strong { display: block; margin-bottom: 2px; color: inherit; font-size: 14px; }
+      .choice span { font-size: 12px; }
+
+      .consent-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin: 2px 0 25px;
+        border-top: 1px solid var(--line);
+        padding-top: 19px;
+      }
+
+      .consent-copy strong { display: block; margin-bottom: 3px; font-size: 14px; }
+      .consent-copy span { color: var(--soft); font-size: 12px; }
+
+      .switch { position: relative; width: 47px; height: 27px; flex: 0 0 auto; }
+      .switch input { position: absolute; opacity: 0; }
+      .switch-track { position: absolute; inset: 0; border-radius: 999px; background: #2b3950; cursor: pointer; transition: 160ms ease; }
+      .switch-track::after { position: absolute; top: 4px; left: 4px; width: 19px; height: 19px; border-radius: 50%; background: #a8b4c4; content: ""; transition: 160ms ease; }
+      .switch input:checked + .switch-track { background: #2e936e; }
+      .switch input:checked + .switch-track::after { transform: translateX(20px); background: white; }
+
+      .primary-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-height: 52px;
+        border: 0;
+        border-radius: 14px;
+        background: var(--mint);
+        color: #09271f;
+        font-size: 15px;
+        font-weight: 850;
+        transition: transform 160ms ease, filter 160ms ease;
+      }
+
+      .primary-button:hover { filter: brightness(1.05); transform: translateY(-1px); }
+      .primary-button:disabled { cursor: wait; filter: saturate(0.55); opacity: 0.72; transform: none; }
+
+      .error-message { min-height: 19px; margin: 9px 0 0; color: var(--coral); font-size: 13px; }
+
+      .result-card { min-height: 570px; padding: 25px; overflow: hidden; }
+
+      .result-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 28px; }
+      .result-header p { margin: 7px 0 0; color: var(--soft); font-size: 13px; }
+
+      .state { min-height: 420px; }
+      .state[hidden] { display: none; }
+
+      .empty-state { display: grid; min-height: 390px; place-items: center; border: 1px dashed rgba(188, 205, 230, 0.19); border-radius: 18px; padding: 24px; text-align: center; }
+
+      .empty-icon { display: grid; width: 75px; height: 75px; margin: 0 auto 17px; place-items: center; border-radius: 24px; background: rgba(153, 246, 198, 0.08); color: var(--mint); font-size: 30px; }
+      .empty-state h3 { margin: 0 0 7px; font-size: 20px; }
+      .empty-state p { max-width: 285px; margin: 0; color: var(--muted); font-size: 14px; }
+
+      .progress-panel { padding-top: 8px; }
+      .progress-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: var(--muted); font-size: 13px; }
+      .progress-value { color: var(--mint); font-weight: 800; }
+      .progress-bar { height: 9px; overflow: hidden; border-radius: 999px; background: #26334a; }
+      .progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #56d9a3, var(--mint)); transition: width 400ms ease; }
+
+      .progress-steps { display: grid; gap: 10px; margin-top: 26px; }
+      .progress-step { display: grid; grid-template-columns: 22px 1fr auto; align-items: center; gap: 10px; padding: 11px 12px; border: 1px solid transparent; border-radius: 12px; color: var(--soft); font-size: 13px; }
+      .progress-step.is-active { border-color: rgba(153, 246, 198, 0.2); background: rgba(153, 246, 198, 0.06); color: var(--ink); }
+      .progress-step.is-done { color: #cfe9db; }
+      .step-dot { display: grid; width: 19px; height: 19px; place-items: center; border: 1px solid #50617a; border-radius: 50%; font-size: 10px; }
+      .is-active .step-dot { border-color: var(--mint); color: var(--mint); }
+      .is-done .step-dot { border-color: var(--mint); background: var(--mint); color: #09271f; }
+      .step-detail { color: var(--soft); font-size: 12px; }
+
+      .success-hero { position: relative; min-height: 159px; overflow: hidden; border-radius: 18px; background: linear-gradient(135deg, #193d3e, #182541 58%, #4a2d32); padding: 22px; }
+      .success-hero::after { position: absolute; right: -34px; bottom: -65px; width: 180px; height: 180px; border: 1px solid rgba(153, 246, 198, 0.3); border-radius: 50%; box-shadow: 0 0 0 23px rgba(153, 246, 198, 0.04), 0 0 0 45px rgba(153, 246, 198, 0.03); content: ""; }
+      .success-hero h3 { position: relative; z-index: 1; max-width: 280px; margin: 13px 0 4px; font-size: 25px; letter-spacing: -0.04em; }
+      .success-hero p { position: relative; z-index: 1; margin: 0; color: #c9e5d9; font-size: 13px; }
+
+      .scene-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 15px 0 20px; }
+      .scene-card { min-height: 67px; border: 1px solid var(--line); border-radius: 11px; background: rgba(4, 12, 24, 0.28); padding: 9px; }
+      .scene-number { display: block; margin-bottom: 5px; color: var(--coral); font-size: 11px; font-weight: 800; }
+      .scene-name { display: block; color: #dce5f0; font-size: 12px; font-weight: 700; line-height: 1.2; }
+
+      .result-actions { display: flex; align-items: center; gap: 10px; }
+      .secondary-button { flex: 1; min-height: 44px; border: 1px solid var(--line); border-radius: 12px; background: rgba(4, 12, 24, 0.25); color: #dce5f0; font-size: 14px; font-weight: 700; }
+      .secondary-button:hover { border-color: rgba(153, 246, 198, 0.55); }
+
+      .storyboard-card { grid-column: 1 / -1; padding: 25px; }
+      .storyboard-card[hidden] { display: none; }
+      .storyboard-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 22px; margin-bottom: 22px; }
+      .storyboard-head h2 { margin-bottom: 6px; }
+      .storyboard-head p { margin: 0; color: var(--soft); font-size: 13px; }
+      .prompt-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+      .prompt-count { display: inline-flex; align-items: center; gap: 5px; border: 1px solid rgba(153, 246, 198, 0.28); border-radius: 999px; background: rgba(153, 246, 198, 0.07); color: #ccefe0; font-size: 12px; font-weight: 800; padding: 9px 11px; white-space: nowrap; }
+      .prompt-count .count-number { color: var(--mint); font-size: 14px; }
+      .copy-all-button, .copy-image-button { border: 1px solid rgba(153, 246, 198, 0.35); border-radius: 10px; background: rgba(153, 246, 198, 0.08); color: var(--mint); font-size: 13px; font-weight: 800; padding: 9px 12px; }
+      .copy-all-button:hover, .copy-image-button:hover { border-color: var(--mint); background: rgba(153, 246, 198, 0.14); }
+      .prompt-rows { display: grid; gap: 12px; }
+      .prompt-row { display: grid; grid-template-columns: 76px minmax(0, 1fr) minmax(0, 1fr); gap: 12px; border-top: 1px solid var(--line); padding-top: 14px; }
+      .prompt-scene { padding: 10px 0; }
+      .prompt-scene .scene-number { margin-bottom: 7px; font-size: 12px; }
+      .prompt-scene .scene-name { font-size: 14px; }
+      .prompt-column { min-width: 0; }
+      .prompt-column-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 7px; color: #dce5f0; font-size: 12px; font-weight: 800; }
+      .prompt-column-head span:last-child { color: var(--soft); font-size: 11px; font-weight: 500; }
+      .prompt-text { min-height: 88px; border: 1px solid var(--line); border-radius: 12px; background: rgba(4, 12, 24, 0.29); color: #bdcadb; font-family: inherit; font-size: 13px; line-height: 1.6; padding: 12px; white-space: pre-wrap; }
+      .video-summary-note { margin-top: 14px; color: var(--soft); font-size: 12px; }
+
+      .toast { position: fixed; right: 22px; bottom: 22px; z-index: 5; max-width: 310px; border: 1px solid rgba(153, 246, 198, 0.35); border-radius: 12px; background: #14253a; box-shadow: var(--shadow); color: #d9f6e7; font-size: 13px; padding: 13px 15px; transform: translateY(22px); opacity: 0; pointer-events: none; transition: 180ms ease; }
+      .toast.is-visible { transform: translateY(0); opacity: 1; }
+
+      .modal[hidden] { display: none; }
+      .modal { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 20px; }
+      .modal-backdrop { position: absolute; inset: 0; background: rgba(3, 7, 14, 0.76); backdrop-filter: blur(8px); }
+      .modal-card { position: relative; width: min(520px, 100%); border: 1px solid var(--line); border-radius: 22px; background: #121d31; box-shadow: var(--shadow); padding: 24px; }
+      .modal-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 15px; margin-bottom: 22px; }
+      .modal-header h2 { margin-bottom: 7px; }
+      .modal-header p { margin: 0; color: var(--soft); font-size: 13px; }
+      .close-button { width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 10px; background: transparent; color: var(--muted); font-size: 20px; line-height: 1; }
+      .close-button:hover { border-color: var(--coral); color: var(--coral); }
+      .api-note { margin-bottom: 18px; border: 1px solid rgba(255, 155, 125, 0.2); border-radius: 12px; background: rgba(255, 155, 125, 0.06); color: #ffd0c2; font-size: 12px; line-height: 1.5; padding: 11px 12px; }
+      .modal-field { display: grid; gap: 7px; margin-bottom: 15px; }
+      .modal-field label { color: #dce5f0; font-size: 13px; font-weight: 700; }
+      .modal-field input, .modal-field select { width: 100%; min-height: 43px; border: 1px solid var(--line); border-radius: 11px; outline: none; background: rgba(4, 12, 24, 0.38); color: var(--ink); font: inherit; font-size: 14px; padding: 9px 11px; }
+      .modal-field input:focus, .modal-field select:focus { border-color: rgba(153, 246, 198, 0.72); box-shadow: 0 0 0 4px rgba(153, 246, 198, 0.1); }
+      .modal-actions { display: flex; gap: 10px; margin-top: 22px; }
+      .modal-actions .primary-button { flex: 1; }
+      .modal-actions .secondary-button { flex: 0 0 120px; }
+      .api-status { min-height: 18px; margin: 12px 0 0; color: var(--mint); font-size: 12px; }
+
+      .qr-manager-grid { display: grid; grid-template-columns: minmax(0, 1fr) 210px; gap: 18px; align-items: start; }
+      .qr-preview { display: grid; min-height: 210px; place-items: center; border: 1px dashed rgba(188, 205, 230, 0.2); border-radius: 15px; background: #f8fbff; padding: 12px; }
+      .qr-preview img { display: block; width: 190px; height: 190px; object-fit: contain; }
+      .qr-preview-empty { color: #637187; font-size: 12px; text-align: center; }
+      .qr-info { margin: 0 0 14px; color: var(--soft); font-size: 12px; line-height: 1.5; }
+      .qr-result { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 15px; }
+      .qr-result[hidden] { display: none; }
+      .qr-result-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 9px; }
+      .qr-result-title { color: #dce5f0; font-size: 13px; font-weight: 800; }
+      .qr-status-pill { display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(153, 246, 198, 0.3); border-radius: 999px; color: var(--mint); font-size: 11px; font-weight: 800; padding: 6px 9px; }
+      .qr-status-pill::before { width: 6px; height: 6px; border-radius: 50%; background: var(--mint); content: ""; }
+      .qr-result-meta { margin: 0; color: var(--soft); font-size: 11px; line-height: 1.55; }
+      .qr-result-url { margin: 9px 0 0; overflow-wrap: anywhere; color: #a9b9cc; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 10px; line-height: 1.4; }
+      .qr-downloads { display: flex; gap: 8px; margin-top: 12px; }
+      .qr-downloads a { flex: 1; border: 1px solid rgba(153, 246, 198, 0.3); border-radius: 10px; background: rgba(153, 246, 198, 0.07); color: var(--mint); font-size: 12px; font-weight: 800; padding: 9px; text-align: center; text-decoration: none; }
+      .qr-downloads a:hover { border-color: var(--mint); background: rgba(153, 246, 198, 0.13); }
+      .qr-history { max-height: 150px; margin-top: 15px; overflow: auto; border-top: 1px solid var(--line); padding-top: 12px; }
+      .qr-history-title { margin-bottom: 7px; color: #dce5f0; font-size: 12px; font-weight: 800; }
+      .qr-history-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 1px solid rgba(188, 205, 230, 0.08); color: var(--muted); font-size: 11px; padding: 7px 0; }
+      .qr-history-row strong { color: #dce5f0; }
+      .qr-history-row span:last-child { color: var(--mint); font-weight: 800; }
+      .qr-manager-status { min-height: 18px; margin: 10px 0 0; color: var(--mint); font-size: 12px; }
+
+      footer { border-top: 1px solid var(--line); padding: 18px 0 24px; color: var(--soft); font-size: 12px; }
+      footer span { color: var(--muted); }
+
+      @media (max-width: 900px) {
+        main { grid-template-columns: 1fr; }
+        .result-card { min-height: auto; }
+        .state { min-height: auto; }
+        .empty-state { min-height: 260px; }
+      }
+
+      @media (max-width: 560px) {
+        .app-shell { width: min(100% - 26px, 1180px); }
+        .topbar { min-height: 70px; }
+        .brand-subtitle, .pilot-badge { display: none; }
+        .topbar-actions { gap: 6px; }
+        .language-button, .api-button, .qr-admin-button { padding: 7px 9px; }
+        .qr-manager-grid { grid-template-columns: 1fr; }
+        .qr-preview { min-height: 190px; }
+        .qr-preview img { width: 170px; height: 170px; }
+        main { gap: 14px; padding: 28px 0 38px; }
+        h1 { font-size: clamp(2.6rem, 16vw, 4.5rem); }
+        .intro-copy { font-size: 16px; }
+        .form-card, .result-card { padding: 19px; border-radius: 19px; }
+        .entry-grid { grid-template-columns: 1fr; }
+        .session-panel { max-width: none; }
+        .session-header { display: block; }
+        .session-status { margin-top: 10px; }
+        .session-actions { align-items: stretch; flex-direction: column; }
+        .session-actions .secondary-button { flex-basis: auto; }
+        .scene-list { grid-template-columns: repeat(2, 1fr); }
+        .result-actions { flex-direction: column; align-items: stretch; }
+        .storyboard-card { padding: 19px; border-radius: 19px; }
+        .storyboard-head { display: block; }
+        .prompt-toolbar { justify-content: flex-start; margin-top: 17px; }
+        .prompt-row { grid-template-columns: 1fr; gap: 6px; }
+        .prompt-scene { display: flex; align-items: baseline; gap: 9px; padding: 8px 0 2px; }
+        .prompt-scene .scene-number { margin: 0; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand" aria-label="Pet FDE">
+          <img class="brand-mark" src="assets/sayelf-logo.png" alt="SAYELF 山野精灵" />
+          <div>
+            <div class="brand-name">Pet FDE</div>
+            <div id="brandSubtitle" class="brand-subtitle">宠物会展内容体验</div>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button id="languageButton" class="language-button" type="button">EN</button>
+          <button id="apiButton" class="api-button" type="button">模型 API</button>
+          <button id="qrManagerButton" class="qr-admin-button" type="button">后台二维码</button>
+          <div id="pilotBadge" class="pilot-badge">Pet Expo Pilot 01</div>
+        </div>
+      </header>
+
+      <main>
+        <section class="workspace" aria-labelledby="page-title">
+          <p id="eyebrow" class="eyebrow">HAPPYPET · MY PET MOVIE</p>
+          <h1 id="page-title">让毛孩子成为<br /><span>电影主角</span></h1>
+          <p id="introCopy" class="intro-copy">留下一个简单的描述，选择你喜欢的电影感，现场生成一支属于它的短片。</p>
+          <div id="storyFlow" class="story-strip" aria-label="故事流程">
+            <span id="storyChip1" class="story-chip">发现</span>
+            <span id="storyChip2" class="story-chip">靠近</span>
+            <span id="storyChip3" class="story-chip">追逐</span>
+            <span id="storyChip4" class="story-chip">反转</span>
+            <span id="storyChip5" class="story-chip">反应</span>
+          </div>
+
+          <div id="inputEntry" class="entry-grid" aria-label="输入入口">
+            <button id="scanQrButton" class="entry-card" type="button">
+              <span class="entry-icon" aria-hidden="true">⌁</span>
+              <span class="entry-copy"><strong id="scanQrTitle">扫码进入</strong><span id="scanQrHint">扫描展位二维码，打开活动入口</span></span>
+              <span class="entry-arrow" aria-hidden="true">↗</span>
+            </button>
+            <label id="photoEntryCard" class="entry-card" for="photoInput" hidden>
+              <span class="entry-icon" aria-hidden="true">◉</span>
+              <span class="entry-copy"><strong id="photoTitle">拍摄宠物照片</strong><span id="photoHint">调用相机或从相册选择图片</span></span>
+              <span class="entry-arrow" aria-hidden="true">↗</span>
+            </label>
+          </div>
+          <input id="qrInput" class="file-input-hidden" type="file" accept="image/*" capture="environment" />
+          <input id="photoInput" class="file-input-hidden" type="file" accept="image/*" capture="environment" />
+          <span id="entryStatus" class="entry-status"></span>
+
+          <section class="surface session-panel" aria-labelledby="sessionTitle">
+            <div class="session-header">
+              <div>
+                <span id="sessionStep" class="step-number">00 / AGENT SESSION</span>
+                <h2 id="sessionTitle">会话接入</h2>
+                <p id="sessionDescription">扫码验证通过后，当前页面会自动进入本次 Agent 会话。</p>
+              </div>
+              <span id="sessionStatus" class="status-pill session-status">未接入</span>
+            </div>
+            <div id="sessionEmpty" class="session-empty">
+              <span id="sessionEmptyText">请先扫描活动二维码；接入成功后，这里会出现会话输入栏。</span>
+              <button id="demoJoinButton" class="copy-all-button" type="button" style="margin-top: 10px">模拟扫码接入</button>
+            </div>
+            <div id="sessionConnected" class="session-connected" hidden>
+              <div class="session-meta"><span id="sessionReadyText">已进入本次会话</span><strong id="sessionCapabilityText">下一步：01 / PET INTAKE</strong></div>
+              <p id="sessionConnectedCopy" class="session-hint">下面的宠物文字和图片会作为本次 Agent 任务的一条输入提交。</p>
+            </div>
+          </section>
+
+          <div id="petIntakeCard" class="surface form-card" style="margin-top: 33px" hidden>
+            <div class="card-heading">
+              <div>
+                <span id="petSectionStep" class="step-number">01 / PET INTAKE</span>
+                <h2 id="petSectionTitle">告诉我们你的宠物</h2>
+              </div>
+              <span id="localDemoBadge" class="quiet-badge">本地演示</span>
+            </div>
+
+            <div class="field">
+              <label id="petDescriptionLabel" class="field-label" for="petDescription">
+                <span id="petDescriptionLabelText">它是什么样的？</span>
+                <small id="petDescriptionHint">一句话就够了</small>
+              </label>
+              <textarea id="petDescription" aria-describedby="descriptionError">一只白色波斯猫</textarea>
+              <p id="descriptionError" class="error-message" role="alert"></p>
+            </div>
+
+            <div class="field">
+              <div class="field-label"><span id="modeLabel">电影风格</span><small id="modeHint">选择一种气质</small></div>
+              <div id="modeGroup" class="choice-row" role="group" aria-label="电影风格">
+                <button id="modeAnimation" class="choice" type="button" data-choice-group="mode" data-value="animation" aria-pressed="true">
+                  <strong>灵动动画</strong><span>轻快、明亮、有趣</span>
+                </button>
+                <button id="modeCinematic" class="choice" type="button" data-choice-group="mode" data-value="cinematic" aria-pressed="false">
+                  <strong>电影质感</strong><span>克制、真实、有戏</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="field-label"><span id="ratioLabel">观看画幅</span><small id="ratioHint">适配你的使用场景</small></div>
+              <div id="ratioGroup" class="choice-row" role="group" aria-label="观看画幅">
+                <button id="ratioPortrait" class="choice" type="button" data-choice-group="ratio" data-value="9:16" aria-pressed="true">
+                  <strong>手机竖屏</strong><span>9:16 · 分享更方便</span>
+                </button>
+                <button id="ratioLandscape" class="choice" type="button" data-choice-group="ratio" data-value="16:9" aria-pressed="false">
+                  <strong>展会大屏</strong><span>16:9 · 现场播放</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="consent-row">
+              <div class="consent-copy">
+                <strong id="consentTitle">允许在 HappyPet 展位播放</strong>
+                <span id="consentHint">只用于本次展会现场，不影响你的分享视频</span>
+              </div>
+              <label id="consentLabel" class="switch" aria-label="允许在展位播放">
+                <input id="hallConsent" type="checkbox" checked />
+                <span class="switch-track"></span>
+              </label>
+            </div>
+
+            <button id="generateButton" class="primary-button" type="button">生成我的宠物电影&nbsp; →</button>
+          </div>
+        </section>
+
+        <section class="surface result-card" aria-live="polite" aria-labelledby="result-title">
+          <div class="result-header">
+            <div>
+              <span id="resultStep" class="step-number">02 / YOUR MOVIE</span>
+              <h2 id="result-title">生成结果</h2>
+              <p id="resultDescription">完成后，这里会出现你的故事预览。</p>
+            </div>
+            <span id="statusPill" class="status-pill">准备就绪</span>
+          </div>
+
+          <div id="readyState" class="state">
+            <div class="empty-state">
+              <div>
+                <div class="empty-icon" aria-hidden="true">◌</div>
+                <h3 id="readyTitle">故事还在等你开始</h3>
+                <p id="readyCopy">完成左侧输入后，Pet FDE 会按固定的 8 个镜头为它安排一次小小的冒险。</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="progressState" class="state" hidden>
+            <div class="progress-panel">
+              <div class="progress-top"><span id="progressLabel">正在准备故事</span><span id="progressValue" class="progress-value">0%</span></div>
+              <div id="progressBar" class="progress-bar" aria-label="生成进度"><div id="progressFill" class="progress-fill"></div></div>
+              <div id="progressSteps" class="progress-steps"></div>
+            </div>
+          </div>
+
+          <div id="successState" class="state" hidden>
+            <div class="success-hero">
+              <span id="successStatus" class="status-pill">已准备好</span>
+              <h3><span id="petName">你的宠物</span><span id="successSuffix">的电影完成了</span></h3>
+              <p id="successMeta">8 个镜头 · 手机竖屏 · 展位播放已开启</p>
+            </div>
+            <div id="sceneList" class="scene-list" aria-label="故事镜头"></div>
+            <div class="result-actions">
+              <button id="previewButton" class="secondary-button" type="button">预览故事</button>
+              <button id="againButton" class="secondary-button" type="button">再生成一次</button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <section id="storyboardPanel" class="surface storyboard-card" hidden aria-labelledby="storyboardTitle">
+        <div class="storyboard-head">
+          <div>
+            <span id="storyboardStep" class="step-number">03 / PROMPT BOARD</span>
+            <h2 id="storyboardTitle">图片与视频分镜</h2>
+            <p id="storyboardDescription">每个故事节点对应一张图片和一条视频分镜，顺序保持一致。</p>
+          </div>
+          <div class="prompt-toolbar">
+            <span id="promptCount" class="prompt-count"><span id="imageCount" class="count-number">0</span> 张图片&nbsp;·&nbsp;<span id="videoCount" class="count-number">0</span> 条视频分镜</span>
+            <button id="copyVideoPromptsButton" class="copy-all-button" type="button">复制全部视频分镜 Prompt</button>
+          </div>
+        </div>
+        <div id="promptRows" class="prompt-rows"></div>
+        <div id="videoSummaryNote" class="video-summary-note">视频分镜支持一次性汇总复制；图片 Prompt 可按单张复制。</div>
+      </section>
+
+      <footer><span id="footerBrand">HappyPet · Smart Motion Ball</span>　|　<span id="footerPilot">Pet Expo Pilot 01 本地演示</span></footer>
+    </div>
+
+    <div id="toast" class="toast" role="status"></div>
+
+    <div id="apiModal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="apiModalTitle">
+      <div class="modal-backdrop" data-close-api></div>
+      <div class="modal-card">
+        <div class="modal-header">
+          <div>
+            <span id="apiModalStep" class="step-number">MODEL CONNECTION</span>
+            <h2 id="apiModalTitle">大模型 API 接入</h2>
+            <p id="apiModalDescription">配置生成服务的入口，当前只保存在本页。</p>
+          </div>
+          <button id="closeApiButton" class="close-button" type="button" aria-label="关闭">×</button>
+        </div>
+        <div id="apiNote" class="api-note">本地演示不会上传或保存 API Key，也不会自动调用外部服务。</div>
+        <div class="modal-field">
+          <label id="apiProviderLabel" for="apiProvider">服务商</label>
+          <select id="apiProvider">
+            <option value="openai">OpenAI-compatible</option>
+            <option value="local">Local endpoint</option>
+            <option value="custom">Custom provider</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <label id="apiEndpointLabel" for="apiEndpoint">Endpoint</label>
+          <input id="apiEndpoint" type="url" placeholder="https://api.example.com/v1" />
+        </div>
+        <div class="modal-field">
+          <label id="apiModelLabel" for="apiModel">模型名称</label>
+          <input id="apiModel" type="text" placeholder="video-model" />
+        </div>
+        <div class="modal-actions">
+          <button id="cancelApiButton" class="secondary-button" type="button">取消</button>
+          <button id="saveApiButton" class="primary-button" type="button">保存本页配置</button>
+        </div>
+        <p id="apiStatus" class="api-status"></p>
+      </div>
+    </div>
+
+    <div id="qrManagerModal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="qrManagerTitle">
+      <div class="modal-backdrop" data-close-qr-manager></div>
+      <div class="modal-card">
+        <div class="modal-header">
+          <div>
+            <span id="qrManagerStep" class="step-number">EXHIBITOR QR</span>
+            <h2 id="qrManagerTitle">参展商二维码</h2>
+            <p id="qrManagerDescription">选择活动、参展商和展位，生成现场展示二维码。</p>
+          </div>
+          <button id="closeQrManagerButton" class="close-button" type="button" aria-label="关闭">×</button>
+        </div>
+        <p id="qrManagerInfo" class="qr-info">二维码在本机生成，加入链接包含短时 Token；不会把展位信息发送到第三方二维码网站。</p>
+        <div class="qr-manager-grid">
+          <div>
+            <div class="modal-field"><label id="qrEventLabel" for="qrEventSelect">活动</label><select id="qrEventSelect"></select></div>
+            <div class="modal-field"><label id="qrExhibitorLabel" for="qrExhibitorSelect">参展商</label><select id="qrExhibitorSelect"></select></div>
+            <div class="modal-field"><label id="qrBoothLabel" for="qrBoothSelect">展位</label><select id="qrBoothSelect"></select></div>
+            <div class="modal-field"><label id="qrCampaignLabel" for="qrCampaignSelect">活动内容</label><select id="qrCampaignSelect"></select></div>
+            <div class="modal-field"><label id="qrBaseUrlLabel" for="qrBaseUrlInput">游客打开地址</label><input id="qrBaseUrlInput" type="url" placeholder="https://petfde.example/" /></div>
+            <button id="generateQrButton" class="primary-button" type="button">生成二维码</button>
+            <p id="qrManagerStatus" class="qr-manager-status"></p>
+          </div>
+          <div>
+            <div id="qrPreview" class="qr-preview"><div id="qrPreviewEmpty" class="qr-preview-empty">生成后显示二维码</div><img id="qrPreviewImage" alt="" hidden /></div>
+            <div id="qrResult" class="qr-result" hidden>
+              <div class="qr-result-head"><span id="qrResultTitle" class="qr-result-title">二维码状态</span><span id="qrResultStatus" class="qr-status-pill">有效</span></div>
+              <p id="qrResultMeta" class="qr-result-meta"></p>
+              <p id="qrResultUrl" class="qr-result-url"></p>
+              <div class="qr-downloads"><a id="downloadPngLink" href="#" download>下载 PNG</a><a id="downloadPdfLink" href="#" download>下载 PDF</a></div>
+            </div>
+          </div>
+        </div>
+        <div id="qrHistory" class="qr-history" hidden><div id="qrHistoryTitle" class="qr-history-title">已生成二维码</div><div id="qrHistoryRows"></div></div>
+      </div>
+    </div>
+
+    <script>
+      const story = ["发现", "靠近", "接触", "追逐", "胜利", "假平静", "反转", "反应"];
+      const storyEn = ["Discover", "Approach", "Contact", "Chase", "Victory", "False resolution", "Reversal", "Reaction"];
+      const storyboard = [
+        { id: "S01", name: "发现", image: "白色波斯猫站在明亮的宠物展会入口旁，发现一颗带有柔和青绿色光环的智能球，清晰主体，温暖现场光，灵动动画风格。", video: "镜头从展会入口缓慢推进，白色波斯猫抬头发现青绿色智能球，耳朵轻轻竖起；保持猫的外观和球的颜色一致，动作自然，3 秒。" },
+        { id: "S02", name: "靠近", image: "白色波斯猫小心走向青绿色智能球，展会地面和 HappyPet 展位作为背景，动作方向清晰，明亮灵动动画风格。", video: "镜头低机位跟拍白色波斯猫向智能球靠近，球在前景轻轻滚动；保持移动方向连续，保留展会环境声想象，3 秒。" },
+        { id: "S03", name: "接触", image: "白色波斯猫伸出前爪触碰青绿色智能球，爪尖与球准确接触，画面焦点集中，动势明确。", video: "切到近景，白色波斯猫前爪准确碰到智能球，接触瞬间出现轻微光效；动作因果清楚，接触前后位置连续，3 秒。" },
+        { id: "S04", name: "追逐", image: "白色波斯猫追逐快速滚动的智能球，展会地面形成动感线条，猫和球都保持清晰身份。", video: "镜头横向追踪白色波斯猫奔跑追球，智能球从左向右滚动；保持猫、球和运动方向一致，节奏轻快，4 秒。" },
+        { id: "S05", name: "胜利", image: "白色波斯猫用身体挡住停下的智能球，抬头露出得意表情，背景有柔和展位灯光，画面有胜利感。", video: "镜头绕到白色波斯猫正面，猫稳稳守住智能球并抬头，灯光短暂变亮；动作收束，形成明确的胜利停顿，3 秒。" },
+        { id: "S06", name: "假平静", image: "白色波斯猫安静趴在智能球旁，像是冒险已经结束，展会背景柔和安静，构图平衡。", video: "镜头固定下来，白色波斯猫趴在球旁短暂休息，环境节奏放慢；保持球的位置不变，制造片刻安静，3 秒。" },
+        { id: "S07", name: "反转", image: "智能球突然亮起青绿色光芒，白色波斯猫惊讶回头，光线从球体向周围扩散，戏剧性反转。", video: "智能球突然启动并发出青绿色光芒，白色波斯猫快速回头；镜头轻微推近，突出产品启动与猫的反应因果，3 秒。" },
+        { id: "S08", name: "反应", image: "白色波斯猫开心地追着重新启动的智能球，回头看向镜头，HappyPet 展位灯光明亮，结尾有分享感。", video: "镜头跟随白色波斯猫再次追球，最后猫回头看向镜头并停在明亮展位前；留下清晰、友好的结尾定格，4 秒。" },
+      ];
+      const storyboardEn = [
+        { id: "S01", name: "Discover", image: "A white Persian cat stands at a bright pet expo entrance and discovers a smart ball with a soft teal glow, clear subject, warm event light, lively animation style.", video: "Slow push-in from the expo entrance as the white Persian cat looks up and discovers the teal smart ball; keep the cat and ball consistent, natural motion, 3 seconds." },
+        { id: "S02", name: "Approach", image: "A white Persian cat carefully walks toward the teal smart ball, with the expo floor and HappyPet booth in the background, clear direction of motion, bright lively animation style.", video: "Low-angle tracking shot as the white Persian cat approaches the smart ball while it rolls gently in the foreground; keep direction continuous, 3 seconds." },
+        { id: "S03", name: "Contact", image: "A white Persian cat reaches out and touches the teal smart ball with its front paw, paw and ball clearly connected, focused composition, readable motion.", video: "Cut to a close-up as the white Persian cat's front paw makes accurate contact with the smart ball and a soft light effect appears; clear cause and effect, 3 seconds." },
+        { id: "S04", name: "Chase", image: "A white Persian cat chases a fast-rolling smart ball, dynamic lines across the expo floor, both cat and ball remain visually consistent.", video: "Lateral tracking shot of the white Persian cat running after the ball as it rolls left to right; keep cat, ball, and motion direction consistent, 4 seconds." },
+        { id: "S05", name: "Victory", image: "A white Persian cat blocks the stopped smart ball with its body and looks up proudly, soft booth lights behind it, a clear moment of victory.", video: "Orbit to the front of the white Persian cat as it guards the smart ball and looks up; lights briefly brighten, then the action settles into a victory beat, 3 seconds." },
+        { id: "S06", name: "False resolution", image: "A white Persian cat rests quietly beside the smart ball as if the adventure is over, calm expo background, balanced composition.", video: "Hold a steady shot while the white Persian cat rests beside the ball and the pace slows; keep the ball position unchanged to create a quiet pause, 3 seconds." },
+        { id: "S07", name: "Reversal", image: "The smart ball suddenly glows teal while the white Persian cat turns back in surprise, light spreading from the ball, a dramatic reversal.", video: "The smart ball suddenly activates with a teal glow and the white Persian cat turns quickly; slight push-in to emphasize the product trigger and reaction, 3 seconds." },
+        { id: "S08", name: "Reaction", image: "A happy white Persian cat chases the reactivated smart ball, looks back toward the camera, bright HappyPet booth lights, a shareable ending.", video: "Follow the white Persian cat chasing the ball again, then hold as it looks back at the camera in front of the bright booth; clear friendly ending pose, 4 seconds." },
+      ];
+      const steps = [
+        ["整理宠物信息", "正在准备故事入口"],
+        ["安排 8 个故事镜头", "正在连接动作顺序"],
+        ["完成本地演示片", "正在整理观看结果"],
+      ];
+      const stepsEn = [
+        ["Prepare pet details", "Preparing the story entry"],
+        ["Arrange 8 story shots", "Connecting the action order"],
+        ["Finish local demo", "Preparing the viewing result"],
+      ];
+      const state = { mode: "animation", ratio: "9:16", language: "zh", generating: false, completed: false, progressIndex: 0, photoName: "", photoFile: null, entryMessageKey: "", entryMessageValue: {}, apiStatusKey: "", session: { status: "idle", mode: "local-demo", joinCode: "", errorKey: "" } };
+      const $ = (id) => document.getElementById(id);
+      let qrManagerOptions = null;
+      const translations = {
+        zh: {
+          brandSubtitle: "宠物会展内容体验", pilotBadge: "Pet Expo Pilot 01", apiButton: "模型 API", languageButton: "EN",
+          pageTitle: "Pet FDE · 我的宠物电影", metaDescription: "Pet FDE · My Pet Movie 本地演示界面", inputEntry: "输入入口", storyFlow: "故事流程", qrFileAria: "选择二维码图片", photoFileAria: "选择宠物照片",
+          eyebrow: "HAPPYPET · MY PET MOVIE", titleHtml: "让毛孩子成为<br /><span>电影主角</span>", introCopy: "留下一个简单的描述，选择你喜欢的电影感，现场生成一支属于它的短片。",
+          story1: "发现", story2: "靠近", story3: "追逐", story4: "反转", story5: "反应",
+          scanQrTitle: "扫码进入", scanQrHint: "扫描展位二维码，打开活动入口", photoTitle: "拍摄宠物照片", photoHint: "调用相机或从相册选择图片",
+          petSectionStep: "01 / PET INTAKE", petSectionTitle: "告诉我们你的宠物", localDemo: "本地演示", petLabel: "它是什么样的？", petHint: "文字或照片，可同时提供",
+          modeLabel: "电影风格", modeHint: "选择一种气质", animation: "灵动动画", animationHint: "轻快、明亮、有趣", cinematic: "电影质感", cinematicHint: "克制、真实、有戏",
+          ratioLabel: "观看画幅", ratioHint: "适配你的使用场景", portrait: "手机竖屏", portraitHint: "9:16 · 分享更方便", landscape: "展会大屏", landscapeHint: "16:9 · 现场播放",
+          consentTitle: "允许在 HappyPet 展位播放", consentHint: "只用于本次展会现场，不影响你的分享视频", consentAria: "允许在展位播放",
+          generate: "生成我的宠物电影&nbsp; →", generating: "正在生成", regenerate: "重新生成我的宠物电影　→",
+          resultStep: "02 / YOUR MOVIE", resultTitle: "生成结果", resultDescription: "完成后，这里会出现你的故事预览。", successSuffix: "的电影完成了",
+          statusReady: "准备就绪", statusProgress: "进行中", statusDone: "已完成", readyTitle: "故事还在等你开始", readyCopy: "完成左侧输入后，Pet FDE 会按固定的 8 个镜头为它安排一次小小的冒险。",
+          progressAria: "生成进度", sceneAria: "故事镜头", successReady: "已准备好", preview: "预览故事", again: "再生成一次",
+          storyboardStep: "03 / PROMPT BOARD", storyboardTitle: "图片与视频分镜", storyboardDescription: "每个故事节点对应一张图片和一条视频分镜，顺序保持一致。",
+          countImages: "张图片", countVideos: "条视频分镜", copyVideo: "复制全部视频分镜 Prompt", imagePrompt: "图片 Prompt", videoPrompt: "视频分镜 Prompt", copy: "复制", copyAll: "汇总复制", videoNote: "视频分镜支持一次性汇总复制；图片 Prompt 可按单张复制。",
+          footerPilot: "Pet Expo Pilot 01 本地演示", descriptionError: "写一句宠物描述或拍摄一张照片，再开始生成。", imageCopied: "图片 Prompt 已复制", videoCopied: "全部视频分镜 Prompt 已复制", copyFailed: "复制没有成功，请手动选择 Prompt 文本。", previewDemo: "演示预览已准备好；真实视频文件将在后续 provider 接入后播放。",
+          photoSelected: "已选择图片：{name}", photoReady: "图片已准备好：{name}", qrRead: "已读取二维码：{value}", qrNoCode: "没有识别到二维码，请重试。", qrFallback: "二维码入口已打开；当前浏览器需要使用支持扫码的相机或二维码图片。",
+          apiStep: "MODEL CONNECTION", apiTitle: "大模型 API 接入", apiDescription: "配置生成服务的入口，当前只保存在本页。", apiNote: "本地演示不会上传或保存 API Key，也不会自动调用外部服务。",
+          apiProvider: "服务商", apiEndpoint: "Endpoint", apiModel: "模型名称", apiPlaceholder: "https://api.example.com/v1", modelPlaceholder: "video-model", close: "关闭", cancel: "取消", saveApi: "保存本页配置", apiSaved: "配置已保存在当前页面，未发送到外部服务。", apiAria: "关闭 API 接入设置", footerBrand: "HappyPet · Smart Motion Ball", successMeta: "8 个镜头 · {ratio} · 展位播放{consent}", consentOn: "已开启", consentOff: "未开启", providerOpenAI: "OpenAI-compatible", providerLocal: "本地 Endpoint", providerCustom: "自定义服务商",
+          sessionStep: "00 / AGENT SESSION", sessionTitle: "会话接入", sessionDescription: "扫码验证通过后，当前页面会自动进入本次 Agent 会话。", sessionStatusIdle: "未接入", sessionStatusVerifying: "正在验证", sessionStatusConnected: "已接入", sessionStatusError: "接入失败", sessionEmpty: "请先扫描活动二维码；接入成功后，这里会出现下一步宠物信息录入。", demoJoin: "模拟扫码接入", sessionReady: "已进入本次会话", sessionCapabilities: "下一步：01 / PET INTAKE", sessionConnectedCopy: "下面的宠物文字和图片会作为本次 Agent 任务的一条输入提交。", sessionVerifying: "正在验证二维码并建立会话…", sessionConnected: "已建立本次 Agent 会话，可以继续填写宠物信息。", sessionQrInvalid: "二维码不是有效的活动接入码。", sessionQrExpired: "二维码已过期，请重新扫描。", sessionQrReadConnecting: "已读取活动二维码，正在自动接入…",
+          qrManagerButton: "后台二维码", qrManagerStep: "EXHIBITOR QR", qrManagerTitle: "参展商二维码", qrManagerDescription: "选择活动、参展商和展位，生成现场展示二维码。", qrManagerInfo: "二维码在本机生成，加入链接包含短时 Token；不会把展位信息发送到第三方二维码网站。", qrEvent: "活动", qrExhibitor: "参展商", qrBooth: "展位", qrCampaign: "活动内容", qrBaseUrl: "游客打开地址", qrBaseUrlPlaceholder: "https://petfde.example/", generateQr: "生成二维码", qrGenerating: "正在生成…", qrPreviewEmpty: "生成后显示二维码", qrResultTitle: "二维码状态", qrActive: "有效", qrGenerated: "二维码已生成，可下载 PNG 或 PDF。", qrServerError: "二维码服务未启动，请使用本地 WebUI 启动方式。", qrHistoryTitle: "已生成二维码", downloadPng: "下载 PNG", downloadPdf: "下载 PDF", qrStatusMeta: "{exhibitor} · 展位 {booth}<br />有效期至 {expires}", qrAdminAria: "关闭二维码管理"
+        },
+        en: {
+          brandSubtitle: "Pet expo content experience", pilotBadge: "Pet Expo Pilot 01", apiButton: "Model API", languageButton: "中文",
+          pageTitle: "Pet FDE · My Pet Movie", metaDescription: "Pet FDE · My Pet Movie local demo", inputEntry: "Input methods", storyFlow: "Story flow", qrFileAria: "Choose QR image", photoFileAria: "Choose pet photo",
+          eyebrow: "HAPPYPET · MY PET MOVIE", titleHtml: "Let your pet become<br /><span>the movie star</span>", introCopy: "Describe your pet, choose a film mood, and create a short story for the expo.",
+          story1: "Discover", story2: "Approach", story3: "Chase", story4: "Reversal", story5: "Reaction",
+          scanQrTitle: "Scan to enter", scanQrHint: "Scan the booth QR code to open the activity", photoTitle: "Take a pet photo", photoHint: "Use the camera or choose from your photos",
+          petSectionStep: "01 / PET INTAKE", petSectionTitle: "Tell us about your pet", localDemo: "Local demo", petLabel: "What are they like?", petHint: "Text or photo; both can be provided",
+          modeLabel: "Film mood", modeHint: "Choose a feeling", animation: "Lively animation", animationHint: "Light, bright, playful", cinematic: "Cinematic", cinematicHint: "Calm, real, expressive",
+          ratioLabel: "Viewing format", ratioHint: "Fit the way you will watch", portrait: "Phone portrait", portraitHint: "9:16 · Easy to share", landscape: "Expo screen", landscapeHint: "16:9 · On-site playback",
+          consentTitle: "Allow playback at the HappyPet booth", consentHint: "Only for this expo; your shared video is unaffected", consentAria: "Allow booth playback",
+          generate: "Generate my pet movie&nbsp; →", generating: "Generating", regenerate: "Generate my pet movie again　→",
+          resultStep: "02 / YOUR MOVIE", resultTitle: "Your result", resultDescription: "Your story preview will appear here when it is ready.", successSuffix: "'s movie is ready",
+          statusReady: "Ready", statusProgress: "In progress", statusDone: "Complete", readyTitle: "Your story is waiting", readyCopy: "Start on the left and Pet FDE will arrange a small adventure across 8 fixed shots.",
+          progressAria: "Generation progress", sceneAria: "Story shots", successReady: "Ready to view", preview: "Preview story", again: "Generate again",
+          storyboardStep: "03 / PROMPT BOARD", storyboardTitle: "Image and video storyboard", storyboardDescription: "Each story beat has one image and one video shot, kept in the same order.",
+          countImages: "images", countVideos: "video shots", copyVideo: "Copy all video storyboard Prompts", imagePrompt: "Image Prompt", videoPrompt: "Video storyboard Prompt", copy: "Copy", copyAll: "Included in summary", videoNote: "Copy all video storyboard Prompts at once; copy image Prompts one by one.",
+          footerPilot: "Pet Expo Pilot 01 · Local demo", descriptionError: "Add a pet description or take a photo before generating.", imageCopied: "Image Prompt copied", videoCopied: "All video storyboard Prompts copied", copyFailed: "Copy did not succeed. Please select the Prompt text manually.", previewDemo: "The demo preview is ready; a real video file will play after a provider is connected.",
+          photoSelected: "Photo selected: {name}", photoReady: "Photo ready: {name}", qrRead: "QR code read: {value}", qrNoCode: "No QR code found. Please try again.", qrFallback: "The QR entry is open; this browser needs a camera or QR image scanner that supports detection.",
+          apiStep: "MODEL CONNECTION", apiTitle: "Connect a model API", apiDescription: "Configure a generation service entry; it stays on this page for now.", apiNote: "This local demo does not upload or save an API key and will not call an external service automatically.",
+          apiProvider: "Provider", apiEndpoint: "Endpoint", apiModel: "Model name", apiPlaceholder: "https://api.example.com/v1", modelPlaceholder: "video-model", close: "Close", cancel: "Cancel", saveApi: "Save on this page", apiSaved: "Configuration is kept on this page and was not sent externally.", apiAria: "Close API connection settings", footerBrand: "HappyPet · Smart Motion Ball", successMeta: "8 shots · {ratio} · Hall playback {consent}", consentOn: "on", consentOff: "off", providerOpenAI: "OpenAI-compatible", providerLocal: "Local endpoint", providerCustom: "Custom provider",
+          sessionStep: "00 / AGENT SESSION", sessionTitle: "Agent session", sessionDescription: "After QR verification, this page automatically enters the Agent session.", sessionStatusIdle: "Not connected", sessionStatusVerifying: "Verifying", sessionStatusConnected: "Connected", sessionStatusError: "Connection failed", sessionEmpty: "Scan the activity QR first; the pet intake step appears after connection.", demoJoin: "Simulate QR join", sessionReady: "Inside this session", sessionCapabilities: "Next: 01 / PET INTAKE", sessionConnectedCopy: "The pet text and image below will be submitted as one Agent task input.", sessionVerifying: "Verifying the QR code and opening the session…", sessionConnected: "This Agent session is connected. Continue with pet intake below.", sessionQrInvalid: "This QR code is not a valid activity join code.", sessionQrExpired: "This QR code has expired. Please scan a new one.", sessionQrReadConnecting: "Activity QR read. Connecting automatically…",
+          qrManagerButton: "QR control desk", qrManagerStep: "EXHIBITOR QR", qrManagerTitle: "Exhibitor QR code", qrManagerDescription: "Choose an event, exhibitor, and booth to create a display QR code.", qrManagerInfo: "The QR code is generated locally. Its short-lived join token is not sent to a third-party QR service.", qrEvent: "Event", qrExhibitor: "Exhibitor", qrBooth: "Booth", qrCampaign: "Campaign", qrBaseUrl: "Visitor join URL", qrBaseUrlPlaceholder: "https://petfde.example/", generateQr: "Generate QR code", qrGenerating: "Generating…", qrPreviewEmpty: "Your QR code will appear here", qrResultTitle: "QR status", qrActive: "Active", qrGenerated: "QR code ready. Download the PNG or PDF asset.", qrServerError: "The QR service is not running. Start the local WebUI server first.", qrHistoryTitle: "Generated QR codes", downloadPng: "Download PNG", downloadPdf: "Download PDF", qrStatusMeta: "{exhibitor} · Booth {booth}<br />Expires {expires}", qrAdminAria: "Close QR manager"
+        }
+      };
+
+      function t(key, values) {
+        let text = (translations[state.language] && translations[state.language][key]) || translations.zh[key] || key;
+        Object.keys(values || {}).forEach(function (name) { text = text.replace("{" + name + "}", values[name]); });
+        return text;
+      }
+
+      function applyLanguage() {
+        document.documentElement.lang = state.language === "en" ? "en" : "zh-CN";
+        document.title = t("pageTitle");
+        document.querySelector('meta[name="description"]').setAttribute("content", t("metaDescription"));
+        document.querySelector(".brand-mark").alt = state.language === "en" ? "SAYELF nature visual creator" : "SAYELF 山野精灵";
+        $("storyFlow").setAttribute("aria-label", t("storyFlow"));
+        $("inputEntry").setAttribute("aria-label", t("inputEntry"));
+        $("modeGroup").setAttribute("aria-label", t("modeLabel"));
+        $("ratioGroup").setAttribute("aria-label", t("ratioLabel"));
+        $("qrInput").setAttribute("aria-label", t("qrFileAria"));
+        $("photoInput").setAttribute("aria-label", t("photoFileAria"));
+        const textIds = {
+          brandSubtitle: "brandSubtitle", pilotBadge: "pilotBadge", apiButton: "apiButton", languageButton: "languageButton",
+          eyebrow: "eyebrow", introCopy: "introCopy", scanQrTitle: "scanQrTitle", scanQrHint: "scanQrHint", photoTitle: "photoTitle", photoHint: "photoHint",
+          petSectionStep: "petSectionStep", petSectionTitle: "petSectionTitle", localDemo: "localDemoBadge", petLabel: "petDescriptionLabel",
+          modeLabel: "modeLabel", modeHint: "modeHint", ratioLabel: "ratioLabel", ratioHint: "ratioHint", consentTitle: "consentTitle", consentHint: "consentHint", petLabel: "petDescriptionLabelText",
+          resultStep: "resultStep", resultTitle: "result-title", resultDescription: "resultDescription", readyTitle: "readyTitle", readyCopy: "readyCopy",
+          storyboardStep: "storyboardStep", storyboardTitle: "storyboardTitle", storyboardDescription: "storyboardDescription",
+          copyVideo: "copyVideoPromptsButton", videoNote: "videoSummaryNote", footerBrand: "footerBrand", footerPilot: "footerPilot",
+          apiStep: "apiModalStep", apiTitle: "apiModalTitle", apiDescription: "apiModalDescription", apiNote: "apiNote", apiProvider: "apiProviderLabel",
+          apiEndpoint: "apiEndpointLabel", apiModel: "apiModelLabel", cancel: "cancelApiButton", saveApi: "saveApiButton",
+          sessionStep: "sessionStep", sessionTitle: "sessionTitle", sessionDescription: "sessionDescription", sessionEmpty: "sessionEmptyText", demoJoin: "demoJoinButton", sessionReady: "sessionReadyText", sessionCapabilities: "sessionCapabilityText", sessionConnectedCopy: "sessionConnectedCopy",
+          qrManagerButton: "qrManagerButton", qrManagerStep: "qrManagerStep", qrManagerTitle: "qrManagerTitle", qrManagerDescription: "qrManagerDescription", qrManagerInfo: "qrManagerInfo", qrEvent: "qrEventLabel", qrExhibitor: "qrExhibitorLabel", qrBooth: "qrBoothLabel", qrCampaign: "qrCampaignLabel", qrBaseUrl: "qrBaseUrlLabel", generateQr: "generateQrButton", qrHistoryTitle: "qrHistoryTitle"
+        };
+        Object.keys(textIds).forEach(function (key) { $(textIds[key]).textContent = t(key); });
+        $("page-title").innerHTML = t("titleHtml");
+        $("petDescriptionHint").textContent = t("petHint");
+        $("modeAnimation").innerHTML = "<strong>" + t("animation") + "</strong><span>" + t("animationHint") + "</span>";
+        $("modeCinematic").innerHTML = "<strong>" + t("cinematic") + "</strong><span>" + t("cinematicHint") + "</span>";
+        $("ratioPortrait").innerHTML = "<strong>" + t("portrait") + "</strong><span>" + t("portraitHint") + "</span>";
+        $("ratioLandscape").innerHTML = "<strong>" + t("landscape") + "</strong><span>" + t("landscapeHint") + "</span>";
+        ["story1", "story2", "story3", "story4", "story5"].forEach(function (key, index) { $("storyChip" + (index + 1)).textContent = t(key); });
+        $("consentLabel").setAttribute("aria-label", t("consentAria"));
+        $("progressBar").setAttribute("aria-label", t("progressAria"));
+        $("sceneList").setAttribute("aria-label", t("sceneAria"));
+        $("closeApiButton").setAttribute("aria-label", t("apiAria"));
+        $("closeApiButton").textContent = "×";
+        $("apiEndpoint").placeholder = t("apiPlaceholder");
+        $("apiModel").placeholder = t("modelPlaceholder");
+        $("apiProvider").options[0].text = t("providerOpenAI");
+        $("apiProvider").options[1].text = t("providerLocal");
+        $("apiProvider").options[2].text = t("providerCustom");
+        $("qrPreviewEmpty").textContent = t("qrPreviewEmpty");
+        $("qrResultTitle").textContent = t("qrResultTitle");
+        $("downloadPngLink").textContent = t("downloadPng");
+        $("downloadPdfLink").textContent = t("downloadPdf");
+        $("qrBaseUrlInput").placeholder = t("qrBaseUrlPlaceholder");
+        $("closeQrManagerButton").setAttribute("aria-label", t("qrAdminAria"));
+        renderSession();
+        $("generateButton").innerHTML = state.generating ? t("generating") + "…" : state.completed ? t("regenerate") : t("generate");
+        $("statusPill").textContent = state.generating ? t("statusProgress") : state.completed ? t("statusDone") : t("statusReady");
+        $("successStatus").textContent = t("successReady");
+        $("successSuffix").textContent = t("successSuffix");
+        $("previewButton").textContent = t("preview");
+        $("againButton").textContent = t("again");
+        if (state.generating) {
+          const activeSteps = state.language === "en" ? stepsEn : steps;
+          $("progressLabel").textContent = activeSteps[Math.min(state.progressIndex, 2)][0];
+          renderProgressSteps(state.progressIndex);
+        }
+        if (state.completed) {
+          const ratioLabel = state.ratio === "9:16" ? t("portrait") : t("landscape");
+          $("successMeta").textContent = t("successMeta", { ratio: ratioLabel, consent: $("hallConsent").checked ? t("consentOn") : t("consentOff") });
+        }
+        if (state.photoName) $("entryStatus").textContent = t("photoReady", { name: state.photoName });
+        else if (state.entryMessageKey) $("entryStatus").textContent = t(state.entryMessageKey, state.entryMessageValue);
+        else $("entryStatus").textContent = "";
+        if (state.apiStatusKey) $("apiStatus").textContent = t(state.apiStatusKey);
+        $("toast").classList.remove("is-visible");
+        $("toast").textContent = "";
+        renderScenes();
+        if (!$("storyboardPanel").hidden) renderStoryboard();
+      }
+
+      function setState(name) {
+        ["readyState", "progressState", "successState"].forEach((id) => { $(id).hidden = id !== name; });
+      }
+
+      function showToast(message) {
+        const toast = $("toast");
+        toast.textContent = message;
+        toast.classList.add("is-visible");
+        window.clearTimeout(showToast.timer);
+        showToast.timer = window.setTimeout(() => toast.classList.remove("is-visible"), 2600);
+      }
+
+      function renderProgressSteps(activeIndex) {
+        $("progressSteps").innerHTML = steps.map(([title, detail], index) => {
+          const isDone = index < activeIndex;
+          const isActive = index === activeIndex;
+          const className = `progress-step${isDone ? " is-done" : ""}${isActive ? " is-active" : ""}`;
+          return `<div class="${className}"><span class="step-dot">${isDone ? "✓" : index + 1}</span><span>${title}</span><span class="step-detail">${isDone ? "完成" : isActive ? detail : "等待"}</span></div>`;
+        }).join("");
+      }
+
+      function renderScenes() {
+        $("sceneList").innerHTML = story.map((name, index) => `<div class="scene-card"><span class="scene-number">S${String(index + 1).padStart(2, "0")}</span><span class="scene-name">${name}</span></div>`).join("");
+      }
+
+      function renderStoryboard() {
+        $("imageCount").textContent = storyboard.length;
+        $("videoCount").textContent = storyboard.length;
+        $("promptRows").innerHTML = storyboard.map(function (item) {
+          return '<article class="prompt-row">' +
+            '<div class="prompt-scene"><span class="scene-number">' + item.id + '</span><span class="scene-name">' + item.name + '</span></div>' +
+            '<div class="prompt-column"><div class="prompt-column-head"><span>图片 Prompt</span><button class="copy-image-button" type="button" data-copy-image="' + item.id + '">复制</button></div><div class="prompt-text">' + item.image + '</div></div>' +
+            '<div class="prompt-column"><div class="prompt-column-head"><span>视频分镜 Prompt</span><span>汇总复制</span></div><div class="prompt-text">' + item.video + '</div></div>' +
+            '</article>';
+        }).join("");
+        document.querySelectorAll("[data-copy-image]").forEach(function (button) {
+          button.addEventListener("click", function () {
+            const item = storyboard.find(function (entry) { return entry.id === button.dataset.copyImage; });
+            copyToClipboard(item.image, item.id + " 图片 Prompt 已复制");
+          });
+        });
+      }
+
+      function videoPromptSummary() {
+        return storyboard.map(function (item) {
+          return item.id + " · " + item.name + "\n" + item.video;
+        }).join("\n\n");
+      }
+
+      async function copyToClipboard(text, message) {
+        let copied = false;
+        try {
+          await navigator.clipboard.writeText(text);
+          copied = true;
+        } catch (error) {
+          const helper = document.createElement("textarea");
+          helper.value = text;
+          helper.style.position = "fixed";
+          helper.style.opacity = "0";
+          document.body.appendChild(helper);
+          helper.focus();
+          helper.select();
+          copied = document.execCommand("copy");
+          helper.remove();
+        }
+        showToast(copied ? message : t("copyFailed"));
+      }
+
+      function renderProgressSteps(activeIndex) {
+        const activeSteps = state.language === "en" ? stepsEn : steps;
+        $("progressSteps").innerHTML = activeSteps.map(function (step, index) {
+          const isDone = index < activeIndex;
+          const isActive = index === activeIndex;
+          const className = "progress-step" + (isDone ? " is-done" : "") + (isActive ? " is-active" : "");
+          return '<div class="' + className + '"><span class="step-dot">' + (isDone ? "✓" : index + 1) + '</span><span>' + step[0] + '</span><span class="step-detail">' + (isDone ? (state.language === "en" ? "Done" : "完成") : isActive ? step[1] : (state.language === "en" ? "Waiting" : "等待")) + '</span></div>';
+        }).join("");
+      }
+
+      function renderScenes() {
+        const currentStory = state.language === "en" ? storyEn : story;
+        $("sceneList").innerHTML = currentStory.map(function (name, index) {
+          return '<div class="scene-card"><span class="scene-number">S' + String(index + 1).padStart(2, "0") + '</span><span class="scene-name">' + name + '</span></div>';
+        }).join("");
+      }
+
+      function renderStoryboard() {
+        const promptItems = state.language === "en" ? storyboardEn : storyboard;
+        $("imageCount").textContent = promptItems.length;
+        $("videoCount").textContent = promptItems.length;
+        $("promptCount").innerHTML = '<span id="imageCount" class="count-number">' + promptItems.length + '</span> ' + t("countImages") + '&nbsp;·&nbsp;<span id="videoCount" class="count-number">' + promptItems.length + '</span> ' + t("countVideos");
+        $("promptRows").innerHTML = promptItems.map(function (item) {
+          return '<article class="prompt-row">' +
+            '<div class="prompt-scene"><span class="scene-number">' + item.id + '</span><span class="scene-name">' + item.name + '</span></div>' +
+            '<div class="prompt-column"><div class="prompt-column-head"><span>' + t("imagePrompt") + '</span><button class="copy-image-button" type="button" data-copy-image="' + item.id + '">' + t("copy") + '</button></div><div class="prompt-text">' + item.image + '</div></div>' +
+            '<div class="prompt-column"><div class="prompt-column-head"><span>' + t("videoPrompt") + '</span><span>' + t("copyAll") + '</span></div><div class="prompt-text">' + item.video + '</div></div>' +
+            '</article>';
+        }).join("");
+        document.querySelectorAll("[data-copy-image]").forEach(function (button) {
+          button.addEventListener("click", function () {
+            const item = promptItems.find(function (entry) { return entry.id === button.dataset.copyImage; });
+            copyToClipboard(item.image, item.id + " " + t("imageCopied"));
+          });
+        });
+      }
+
+      function videoPromptSummary() {
+        const promptItems = state.language === "en" ? storyboardEn : storyboard;
+        return promptItems.map(function (item) {
+          return item.id + " · " + item.name + "\n" + item.video;
+        }).join("\n\n");
+      }
+
+      function renderSession() {
+        const session = state.session;
+        const statusText = session.status === "connected" ? t("sessionStatusConnected") : session.status === "verifying" ? t("sessionStatusVerifying") : session.status === "error" ? t("sessionStatusError") : t("sessionStatusIdle");
+        const status = $("sessionStatus");
+        status.textContent = statusText;
+        status.classList.remove("is-verifying", "is-connected", "is-error");
+        if (session.status === "verifying") status.classList.add("is-verifying");
+        if (session.status === "connected") status.classList.add("is-connected");
+        if (session.status === "error") status.classList.add("is-error");
+        $("photoEntryCard").hidden = session.status !== "connected";
+        $("petIntakeCard").hidden = session.status !== "connected";
+        $("sessionEmpty").hidden = session.status === "connected";
+        $("sessionConnected").hidden = session.status !== "connected";
+        if (session.status !== "connected") {
+          $("sessionEmptyText").textContent = session.status === "verifying" ? t("sessionVerifying") : session.status === "error" && session.errorKey ? t(session.errorKey) : t("sessionEmpty");
+        }
+      }
+
+      function parseJoinCode(rawValue) {
+        if (!rawValue) return null;
+        let candidate = String(rawValue).trim();
+        try {
+          if (candidate.indexOf("petfde://") === 0) candidate = "https://petfde.local/" + candidate.slice("petfde://".length).replace(/^join\??/, "join?");
+          const url = new URL(candidate, window.location.href);
+          const token = url.searchParams.get("join_token");
+          const eventId = url.searchParams.get("event");
+          const expiresAt = Number(url.searchParams.get("exp") || 0);
+          if (!token || !eventId) return null;
+          if (expiresAt && expiresAt < Math.floor(Date.now() / 1000)) return { expired: true };
+          return { token: token, event: eventId, booth: url.searchParams.get("booth") || "", expiresAt: expiresAt };
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function autoJoinFromUrl() {
+        const joinCode = parseJoinCode(window.location.href);
+        if (!joinCode) return;
+        if (joinCode.expired) {
+          state.entryMessageKey = "sessionQrExpired";
+          applyLanguage();
+          return;
+        }
+        state.entryMessageKey = "sessionQrReadConnecting";
+        applyLanguage();
+        connectAgentSession(joinCode, "qr-link");
+      }
+
+      function connectAgentSession(joinCode, mode) {
+        state.session = { status: "verifying", mode: mode || "local-demo", joinCode: joinCode || "", errorKey: "" };
+        renderSession();
+        showToast(t("sessionVerifying"));
+        window.setTimeout(function () {
+          state.session.status = "connected";
+          renderSession();
+          showToast(t("sessionConnected"));
+        }, 420);
+      }
+
+      function escapeHtml(value) {
+        return String(value || "").replace(/[&<>\"']/g, function (character) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[character];
+        });
+      }
+
+      function fillQrSelect(id, items, valueKey, labelKey) {
+        $(id).innerHTML = items.map(function (item) {
+          return '<option value="' + escapeHtml(item[valueKey]) + '">' + escapeHtml(item[labelKey]) + '</option>';
+        }).join("");
+      }
+
+      async function loadQrHistory() {
+        if (!qrManagerOptions) return;
+        const eventId = $("qrEventSelect").value;
+        const response = await fetch("/api/qr/status?event_id=" + encodeURIComponent(eventId));
+        if (!response.ok) throw new Error("QR_STATUS_FAILED");
+        const data = await response.json();
+        const items = data.items || [];
+        $("qrHistory").hidden = !items.length;
+        $("qrHistoryRows").innerHTML = items.map(function (item) {
+          return '<div class="qr-history-row"><strong>' + escapeHtml(item.exhibitor_name) + " · " + escapeHtml(item.booth_code) + '</strong><span>' + escapeHtml(item.status === "ACTIVE" ? t("qrActive") : item.status) + '</span></div>';
+        }).join("");
+      }
+
+      async function loadQrManager() {
+        if (!qrManagerOptions) {
+          const response = await fetch("/api/qr/options");
+          if (!response.ok) throw new Error("QR_OPTIONS_FAILED");
+          qrManagerOptions = await response.json();
+          fillQrSelect("qrEventSelect", qrManagerOptions.events, "id", "name");
+          fillQrSelect("qrExhibitorSelect", qrManagerOptions.exhibitors, "id", "name");
+          fillQrSelect("qrBoothSelect", qrManagerOptions.booths, "code", "name");
+          fillQrSelect("qrCampaignSelect", qrManagerOptions.campaigns, "id", "name");
+        }
+        await loadQrHistory();
+      }
+
+      async function generateQrAsset() {
+        const button = $("generateQrButton");
+        button.disabled = true;
+        button.innerHTML = t("qrGenerating");
+        $("qrManagerStatus").textContent = "";
+        try {
+          const response = await fetch("/api/qr/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              event_id: $("qrEventSelect").value,
+              exhibitor_id: $("qrExhibitorSelect").value,
+              booth_code: $("qrBoothSelect").value,
+              campaign_id: $("qrCampaignSelect").value,
+              base_url: $("qrBaseUrlInput").value.trim() || window.location.origin + "/"
+            })
+          });
+          if (!response.ok) throw new Error("QR_GENERATE_FAILED");
+          const result = await response.json();
+          $("qrPreviewImage").src = result.png_url;
+          $("qrPreviewImage").alt = result.exhibitor_name + " " + result.booth_code;
+          $("qrPreviewImage").hidden = false;
+          $("qrPreviewEmpty").hidden = true;
+          $("qrResult").hidden = false;
+          $("qrResultStatus").textContent = t("qrActive");
+          $("qrResultMeta").innerHTML = t("qrStatusMeta", { exhibitor: result.exhibitor_name, booth: result.booth_code, expires: result.expires_at });
+          $("qrResultUrl").textContent = result.join_url;
+          $("downloadPngLink").href = result.png_url;
+          $("downloadPdfLink").href = result.pdf_url;
+          $("qrManagerStatus").textContent = t("qrGenerated");
+          await loadQrHistory();
+        } catch (error) {
+          $("qrManagerStatus").textContent = t("qrServerError");
+        } finally {
+          button.disabled = false;
+          button.innerHTML = t("generateQr");
+        }
+      }
+
+      function startGeneration() {
+        const description = $("petDescription").value.trim();
+        $("descriptionError").textContent = "";
+        if (!description && !state.photoFile) {
+          $("descriptionError").textContent = "先写一句宠物描述，再开始生成。";
+          $("petDescription").focus();
+          return;
+        }
+
+        const button = $("generateButton");
+        button.disabled = true;
+        button.textContent = "正在生成…";
+        $("statusPill").textContent = "进行中";
+        setState("progressState");
+        renderProgressSteps(0);
+
+        let progress = 0;
+        const timer = window.setInterval(() => {
+          progress += 25;
+          const activeIndex = Math.min(Math.floor(progress / 34), 2);
+          $("progressFill").style.width = `${progress}%`;
+          $("progressValue").textContent = `${progress}%`;
+          $("progressLabel").textContent = steps[Math.min(activeIndex, 2)][0];
+          renderProgressSteps(activeIndex);
+          if (progress >= 100) {
+            window.clearInterval(timer);
+            finishGeneration(description);
+          }
+        }, 650);
+      }
+
+      function finishGeneration(description) {
+        const button = $("generateButton");
+        const consent = $("hallConsent").checked;
+        const petTitle = description || (state.language === "en" ? "Your pet" : "你的宠物");
+        $("petName").textContent = petTitle.length > 18 ? `${petTitle.slice(0, 18)}…` : petTitle;
+        $("successMeta").textContent = `8 个镜头 · ${state.ratio} · 展位播放${consent ? "已开启" : "未开启"}`;
+        renderScenes();
+        renderStoryboard();
+        $("storyboardPanel").hidden = false;
+        $("statusPill").textContent = "已完成";
+        setState("successState");
+        button.disabled = false;
+        button.textContent = "重新生成我的宠物电影　→";
+      }
+
+      function startGeneration() {
+        const description = $("petDescription").value.trim();
+        $("descriptionError").textContent = "";
+        if (!description && !state.photoFile) {
+          $("descriptionError").textContent = t("descriptionError");
+          $("petDescription").focus();
+          return;
+        }
+        const button = $("generateButton");
+        state.generating = true;
+        state.completed = false;
+        state.progressIndex = 0;
+        button.disabled = true;
+        button.innerHTML = t("generating") + "…";
+        $("statusPill").textContent = t("statusProgress");
+        setState("progressState");
+        renderProgressSteps(0);
+        let progress = 0;
+        const timer = window.setInterval(function () {
+          progress += 25;
+          state.progressIndex = Math.min(Math.floor(progress / 34), 2);
+          const activeSteps = state.language === "en" ? stepsEn : steps;
+          $("progressFill").style.width = progress + "%";
+          $("progressValue").textContent = progress + "%";
+          $("progressLabel").textContent = activeSteps[state.progressIndex][0];
+          renderProgressSteps(state.progressIndex);
+          if (progress >= 100) {
+            window.clearInterval(timer);
+            finishGeneration(description);
+          }
+        }, 650);
+      }
+
+      function finishGeneration(description) {
+        const button = $("generateButton");
+        const consent = $("hallConsent").checked;
+        const ratioLabel = state.ratio === "9:16" ? t("portrait") : t("landscape");
+        state.generating = false;
+        state.completed = true;
+        const petTitle = description || (state.language === "en" ? "Your pet" : "你的宠物");
+        $("petName").textContent = petTitle.length > 18 ? petTitle.slice(0, 18) + "…" : petTitle;
+        $("successMeta").textContent = t("successMeta", { ratio: ratioLabel, consent: consent ? t("consentOn") : t("consentOff") });
+        renderScenes();
+        renderStoryboard();
+        $("storyboardPanel").hidden = false;
+        $("statusPill").textContent = t("statusDone");
+        setState("successState");
+        button.disabled = false;
+        button.innerHTML = t("regenerate");
+      }
+
+      document.querySelectorAll("[data-choice-group]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const group = button.dataset.choiceGroup;
+          state[group] = button.dataset.value;
+          document.querySelectorAll(`[data-choice-group="${group}"]`).forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+        });
+      });
+
+      $("generateButton").addEventListener("click", () => {
+        if ($("successState").hidden === false) {
+          setState("readyState");
+          $("statusPill").textContent = "准备就绪";
+          $("storyboardPanel").hidden = true;
+        }
+        startGeneration();
+      });
+
+      $("againButton").addEventListener("click", () => {
+        state.completed = false;
+        setState("readyState");
+        $("storyboardPanel").hidden = true;
+        $("statusPill").textContent = t("statusReady");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      $("previewButton").addEventListener("click", () => showToast(t("previewDemo")));
+      $("copyVideoPromptsButton").addEventListener("click", () => copyToClipboard(videoPromptSummary(), t("videoCopied")));
+
+      $("languageButton").addEventListener("click", function () {
+        state.language = state.language === "zh" ? "en" : "zh";
+        applyLanguage();
+      });
+
+      $("photoInput").addEventListener("change", function (event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        state.photoName = file.name;
+        state.photoFile = file;
+        state.entryMessageKey = "";
+        applyLanguage();
+        showToast(t("photoReady", { name: file.name }));
+        event.target.value = "";
+      });
+
+      $("scanQrButton").addEventListener("click", function () { $("qrInput").click(); });
+      $("qrInput").addEventListener("change", async function (event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        state.photoName = "";
+        state.entryMessageKey = "qrFallback";
+        state.entryMessageValue = {};
+        if ("BarcodeDetector" in window && typeof createImageBitmap === "function") {
+          try {
+            const bitmap = await createImageBitmap(file);
+            const detector = new BarcodeDetector({ formats: ["qr_code"] });
+            const codes = await detector.detect(bitmap);
+            if (codes[0] && codes[0].rawValue) {
+              const joinCode = parseJoinCode(codes[0].rawValue);
+              if (joinCode && !joinCode.expired) {
+                state.entryMessageKey = "sessionQrReadConnecting";
+                state.entryMessageValue = {};
+                connectAgentSession(joinCode, "qr");
+              } else if (joinCode && joinCode.expired) {
+                state.entryMessageKey = "sessionQrExpired";
+              } else {
+                state.entryMessageKey = "sessionQrInvalid";
+              }
+            } else {
+              state.entryMessageKey = "qrNoCode";
+            }
+            if (bitmap.close) bitmap.close();
+          } catch (error) {
+            state.entryMessageKey = "qrFallback";
+          }
+        }
+        applyLanguage();
+        showToast(t(state.entryMessageKey, state.entryMessageValue));
+        event.target.value = "";
+      });
+
+      $("demoJoinButton").addEventListener("click", function () {
+        const demoJoinCode = { token: "demo-pilot-01", event: "event-pilot-01", booth: "A17", expiresAt: Math.floor(Date.now() / 1000) + 900 };
+        state.entryMessageKey = "sessionQrReadConnecting";
+        state.entryMessageValue = {};
+        applyLanguage();
+        connectAgentSession(demoJoinCode, "local-demo");
+      });
+
+      function openQrManager() {
+        $("qrManagerModal").hidden = false;
+        $("qrManagerStatus").textContent = "";
+        if (!$("qrBaseUrlInput").value) $("qrBaseUrlInput").value = window.location.origin + "/";
+        loadQrManager().catch(function () { $("qrManagerStatus").textContent = t("qrServerError"); });
+      }
+
+      function closeQrManager() {
+        $("qrManagerModal").hidden = true;
+      }
+
+      $("qrManagerButton").addEventListener("click", function () { window.location.href = "/admin.html"; });
+      $("closeQrManagerButton").addEventListener("click", closeQrManager);
+      document.querySelectorAll("[data-close-qr-manager]").forEach(function (element) { element.addEventListener("click", closeQrManager); });
+      $("generateQrButton").addEventListener("click", generateQrAsset);
+      $("qrEventSelect").addEventListener("change", function () { loadQrHistory().catch(function () {}); });
+
+      function openApiModal() {
+        $("apiModal").hidden = false;
+        $("apiStatus").textContent = state.apiStatusKey ? t(state.apiStatusKey) : "";
+        $("apiEndpoint").focus();
+      }
+
+      function closeApiModal() {
+        $("apiModal").hidden = true;
+      }
+
+      $("apiButton").addEventListener("click", openApiModal);
+      $("closeApiButton").addEventListener("click", closeApiModal);
+      $("cancelApiButton").addEventListener("click", closeApiModal);
+      document.querySelectorAll("[data-close-api]").forEach(function (element) { element.addEventListener("click", closeApiModal); });
+      $("saveApiButton").addEventListener("click", function () {
+        state.apiStatusKey = "apiSaved";
+        applyLanguage();
+        showToast(t("apiSaved"));
+      });
+
+      applyLanguage();
+      autoJoinFromUrl();
+    </script>
+  </body>
+</html>

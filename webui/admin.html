@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1220" />
+    <title>Pet FDE · 二维码后台</title>
+    <style>
+      :root { color-scheme: dark; --ink: #f3f7fb; --muted: #a2afc1; --soft: #738198; --surface: #121d31; --surface-2: #17243a; --line: rgba(188, 205, 230, .14); --mint: #99f6c6; --coral: #ff9b7d; --navy: #0b1220; }
+      * { box-sizing: border-box; }
+      body { min-width: 320px; margin: 0; background: radial-gradient(circle at 10% 0%, rgba(61, 116, 125, .22), transparent 28rem), var(--navy); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 1.5; }
+      button, input, select { font: inherit; }
+      button { cursor: pointer; }
+      .shell { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+      .topbar { display: flex; align-items: center; justify-content: space-between; min-height: 78px; border-bottom: 1px solid var(--line); }
+      .brand { display: flex; align-items: center; gap: 12px; }
+      .brand-mark { width: 44px; height: 44px; border: 1px solid rgba(153, 246, 198, .45); border-radius: 50%; object-fit: cover; background: #030605; }
+      .brand-name { font-weight: 850; letter-spacing: .02em; }
+      .brand-subtitle { color: var(--soft); font-size: 12px; }
+      .top-actions { display: flex; align-items: center; gap: 9px; }
+      .top-button { min-height: 36px; border: 1px solid var(--line); border-radius: 10px; background: rgba(4, 12, 24, .36); color: #dce5f0; font-size: 13px; font-weight: 800; padding: 8px 12px; }
+      .top-button:hover { border-color: rgba(153, 246, 198, .58); color: var(--mint); }
+      main { padding: 48px 0 60px; }
+      .eyebrow { margin: 0 0 13px; color: var(--mint); font-size: 12px; font-weight: 850; letter-spacing: .16em; }
+      h1, h2, p { margin-top: 0; }
+      h1 { max-width: 720px; margin-bottom: 14px; font-size: clamp(2.3rem, 6vw, 4.7rem); letter-spacing: -.06em; line-height: .98; }
+      h1 span { color: var(--mint); }
+      .intro { max-width: 650px; margin-bottom: 30px; color: var(--muted); font-size: 16px; }
+      .flow { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+      .flow span { border: 1px solid var(--line); border-radius: 999px; color: #cbd7e6; font-size: 12px; padding: 7px 10px; }
+      .workspace { display: grid; grid-template-columns: minmax(0, .92fr) minmax(350px, 1.08fr); gap: 18px; }
+      .surface { border: 1px solid var(--line); border-radius: 22px; background: linear-gradient(145deg, rgba(23, 36, 58, .96), rgba(15, 25, 43, .96)); box-shadow: 0 24px 70px rgba(0, 0, 0, .25); }
+      .card { padding: 24px; }
+      .card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 15px; margin-bottom: 20px; }
+      .step { display: block; margin-bottom: 5px; color: var(--coral); font-size: 12px; font-weight: 850; letter-spacing: .12em; }
+      h2 { margin-bottom: 0; font-size: 21px; letter-spacing: -.03em; }
+      .card-head p { max-width: 270px; margin: 6px 0 0; color: var(--soft); font-size: 12px; }
+      .field { display: grid; gap: 7px; margin-bottom: 15px; }
+      .field label { color: #dce5f0; font-size: 13px; font-weight: 750; }
+      .field select, .field input { width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 11px; outline: none; background: rgba(4, 12, 24, .38); color: var(--ink); padding: 9px 11px; }
+      .field select:focus, .field input:focus { border-color: rgba(153, 246, 198, .72); box-shadow: 0 0 0 4px rgba(153, 246, 198, .1); }
+      .note { margin: 2px 0 18px; color: var(--soft); font-size: 11px; line-height: 1.55; }
+      .primary { width: 100%; min-height: 50px; border: 0; border-radius: 13px; background: var(--mint); color: #09271f; font-size: 14px; font-weight: 850; }
+      .primary:hover { filter: brightness(1.06); }
+      .primary:disabled { cursor: wait; opacity: .65; }
+      .status-message { min-height: 20px; margin: 11px 0 0; color: var(--mint); font-size: 12px; }
+      .preview-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 19px; align-items: start; }
+      .qr-box { display: grid; min-height: 220px; place-items: center; border-radius: 15px; background: #f8fbff; padding: 13px; }
+      .qr-box img { width: 194px; height: 194px; object-fit: contain; }
+      .qr-empty { color: #637187; font-size: 12px; text-align: center; }
+      .qr-empty[hidden], .qr-box img[hidden], .result[hidden], .history[hidden] { display: none; }
+      .result { border-top: 1px solid var(--line); padding-top: 16px; }
+      .result-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+      .result-title { color: #dce5f0; font-size: 13px; font-weight: 850; }
+      .status-pill { display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(153, 246, 198, .32); border-radius: 999px; color: var(--mint); font-size: 11px; font-weight: 850; padding: 6px 9px; }
+      .status-pill::before { width: 6px; height: 6px; border-radius: 50%; background: var(--mint); content: ""; }
+      .meta { margin: 0; color: var(--soft); font-size: 12px; line-height: 1.55; }
+      .join-url { margin: 9px 0 0; overflow-wrap: anywhere; color: #a9b9cc; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 10px; line-height: 1.4; }
+      .downloads { display: flex; gap: 8px; margin-top: 13px; }
+      .downloads a { flex: 1; border: 1px solid rgba(153, 246, 198, .32); border-radius: 10px; background: rgba(153, 246, 198, .07); color: var(--mint); font-size: 12px; font-weight: 850; padding: 9px; text-align: center; text-decoration: none; }
+      .downloads a:hover { border-color: var(--mint); background: rgba(153, 246, 198, .14); }
+      .history { margin-top: 20px; border-top: 1px solid var(--line); padding-top: 15px; }
+      .history-title { margin-bottom: 6px; color: #dce5f0; font-size: 13px; font-weight: 850; }
+      .history-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 1px solid rgba(188, 205, 230, .08); color: var(--muted); font-size: 12px; padding: 8px 0; }
+      .history-row strong { color: #dce5f0; }
+      .history-row span { color: var(--mint); font-weight: 800; }
+      footer { border-top: 1px solid var(--line); padding: 18px 0 24px; color: var(--soft); font-size: 12px; }
+      @media (max-width: 840px) { .workspace { grid-template-columns: 1fr; } }
+      @media (max-width: 560px) { .shell { width: min(100% - 26px, 1120px); } .topbar { min-height: 70px; } .brand-subtitle { display: none; } .top-button { padding: 7px 9px; } main { padding: 32px 0 42px; } .card { padding: 19px; } .preview-layout { grid-template-columns: 1fr; } .qr-box { min-height: 200px; } }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header class="topbar">
+        <div class="brand"><img class="brand-mark" src="assets/sayelf-logo.png" alt="SAYELF 山野精灵" /><div><div class="brand-name">Pet FDE</div><div id="brandSubtitle" class="brand-subtitle">展会 Agent 后台</div></div></div>
+        <div class="top-actions"><button id="languageButton" class="top-button" type="button">EN</button><button id="visitorButton" class="top-button" type="button">游客页面</button></div>
+      </header>
+
+      <main>
+        <p id="eyebrow" class="eyebrow">PET EXPO · CONTROL DESK</p>
+        <h1 id="pageTitle">生成并分发<br /><span>展位二维码</span></h1>
+        <p id="intro" class="intro">Agent 在后台电脑运行。选择活动、参展商和展位，生成二维码后下载给参展商打印展示；游客直接用手机相机扫描。</p>
+        <div class="flow"><span id="flow1">选择活动</span><span id="flow2">选择参展商</span><span id="flow3">选择展位</span><span id="flow4">生成并下载</span></div>
+
+        <div class="workspace">
+          <section class="surface card" aria-labelledby="formTitle">
+            <div class="card-head"><div><span id="formStep" class="step">01 / QR SETUP</span><h2 id="formTitle">二维码生成</h2><p id="formDescription">为每个展位创建独立的游客入口。</p></div></div>
+            <div class="field"><label id="eventLabel" for="eventSelect">活动</label><select id="eventSelect"></select></div>
+            <div class="field"><label id="exhibitorLabel" for="exhibitorSelect">参展商</label><select id="exhibitorSelect"></select></div>
+            <div class="field"><label id="boothLabel" for="boothSelect">展位</label><select id="boothSelect"></select></div>
+            <div class="field"><label id="campaignLabel" for="campaignSelect">活动内容</label><select id="campaignSelect"></select></div>
+            <div class="field"><label id="baseUrlLabel" for="baseUrlInput">游客打开地址</label><input id="baseUrlInput" type="url" placeholder="https://petfde.example/" /></div>
+            <p id="note" class="note">二维码在本机生成；请使用游客手机可访问的 HTTPS 域名或现场局域网地址，不能使用 localhost。</p>
+            <button id="generateButton" class="primary" type="button">生成二维码</button>
+            <p id="statusMessage" class="status-message" role="status"></p>
+          </section>
+
+          <section class="surface card" aria-labelledby="resultTitle">
+            <div class="card-head"><div><span id="resultStep" class="step">02 / QR ASSET</span><h2 id="resultTitle">二维码资产</h2><p id="resultDescription">生成后可下载 PNG 或打印版 PDF。</p></div></div>
+            <div class="preview-layout">
+              <div class="qr-box"><div id="qrEmpty" class="qr-empty">生成后显示二维码</div><img id="qrImage" alt="" hidden /></div>
+              <div id="result" class="result" hidden>
+                <div class="result-head"><span id="resultStatusTitle" class="result-title">二维码状态</span><span id="resultStatus" class="status-pill">有效</span></div>
+                <p id="resultMeta" class="meta"></p>
+                <p id="resultUrl" class="join-url"></p>
+                <div class="downloads"><a id="pngLink" href="#" download>下载 PNG</a><a id="pdfLink" href="#" download>下载 PDF</a></div>
+              </div>
+            </div>
+            <div id="history" class="history" hidden><div id="historyTitle" class="history-title">已生成二维码</div><div id="historyRows"></div></div>
+          </section>
+        </div>
+      </main>
+      <footer><span id="footerText">Pet FDE · QR Control Desk · 本地后台</span></footer>
+    </div>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const state = { language: "zh", options: null, lastResult: null, statusKey: "" };
+      const i18n = {
+        zh: { brandSubtitle: "展会 Agent 后台", visitor: "游客页面", eyebrow: "PET EXPO · CONTROL DESK", titleHtml: "生成并分发<br /><span>展位二维码</span>", intro: "Agent 在后台电脑运行。选择活动、参展商和展位，生成二维码后下载给参展商打印展示；游客直接用手机相机扫描。", flow1: "选择活动", flow2: "选择参展商", flow3: "选择展位", flow4: "生成并下载", formStep: "01 / QR SETUP", formTitle: "二维码生成", formDescription: "为每个展位创建独立的游客入口。", event: "活动", exhibitor: "参展商", booth: "展位", campaign: "活动内容", baseUrl: "游客打开地址", baseUrlPlaceholder: "https://petfde.example/", note: "二维码在本机生成；请使用游客手机可访问的 HTTPS 域名或现场局域网地址，不能使用 localhost。", generate: "生成二维码", generating: "正在生成…", resultStep: "02 / QR ASSET", resultTitle: "二维码资产", resultDescription: "生成后可下载 PNG 或打印版 PDF。", qrEmpty: "生成后显示二维码", statusTitle: "二维码状态", active: "有效", generated: "二维码已生成，可下载 PNG 或 PDF。", serverError: "后台服务未启动，请先运行本地 WebUI 服务。", expires: "有效期至 {expires}", downloadPng: "下载 PNG", downloadPdf: "下载 PDF", history: "已生成二维码", footer: "Pet FDE · QR Control Desk · 本地后台" },
+        en: { brandSubtitle: "Expo Agent control desk", visitor: "Visitor page", eyebrow: "PET EXPO · CONTROL DESK", titleHtml: "Create and distribute<br /><span>booth QR codes</span>", intro: "The Agent runs on the background computer. Choose an event, exhibitor, and booth, then download the QR asset for display; visitors scan with their phone camera.", flow1: "Choose event", flow2: "Choose exhibitor", flow3: "Choose booth", flow4: "Generate and download", formStep: "01 / QR SETUP", formTitle: "QR generation", formDescription: "Create one visitor entry for each booth.", event: "Event", exhibitor: "Exhibitor", booth: "Booth", campaign: "Campaign", baseUrl: "Visitor join URL", baseUrlPlaceholder: "https://petfde.example/", note: "The QR is generated locally. Use an HTTPS domain or a LAN address reachable from visitor phones; localhost will not work.", generate: "Generate QR code", generating: "Generating…", resultStep: "02 / QR ASSET", resultTitle: "QR asset", resultDescription: "Download a PNG or print-ready PDF after generation.", qrEmpty: "Your QR code will appear here", statusTitle: "QR status", active: "Active", generated: "QR code ready. Download the PNG or PDF asset.", serverError: "The background service is not running. Start the local WebUI service first.", expires: "Expires {expires}", downloadPng: "Download PNG", downloadPdf: "Download PDF", history: "Generated QR codes", footer: "Pet FDE · QR Control Desk · Local backend" }
+      };
+      function t(key, values) { let value = i18n[state.language][key]; Object.keys(values || {}).forEach((name) => { value = value.replace("{" + name + "}", values[name]); }); return value; }
+      function escapeHtml(value) { return String(value || "").replace(/[&<>\"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[character])); }
+      function applyLanguage() {
+        document.documentElement.lang = state.language === "en" ? "en" : "zh-CN";
+        document.title = state.language === "en" ? "Pet FDE · QR Control Desk" : "Pet FDE · 二维码后台";
+        const ids = { brandSubtitle: "brandSubtitle", visitor: "visitorButton", eyebrow: "eyebrow", intro: "intro", flow1: "flow1", flow2: "flow2", flow3: "flow3", flow4: "flow4", formStep: "formStep", formTitle: "formTitle", formDescription: "formDescription", event: "eventLabel", exhibitor: "exhibitorLabel", booth: "boothLabel", campaign: "campaignLabel", baseUrl: "baseUrlLabel", note: "note", generate: "generateButton", resultStep: "resultStep", resultTitle: "resultTitle", resultDescription: "resultDescription", qrEmpty: "qrEmpty", statusTitle: "resultStatusTitle", history: "historyTitle", footer: "footerText" };
+        Object.keys(ids).forEach((key) => { $(ids[key]).textContent = t(key); });
+        $("pageTitle").innerHTML = t("titleHtml");
+        $("baseUrlInput").placeholder = t("baseUrlPlaceholder");
+        $("languageButton").textContent = state.language === "en" ? "中文" : "EN";
+        $("generateButton").textContent = $("generateButton").disabled ? t("generating") : t("generate");
+        $("resultStatus").textContent = t("active");
+        $("pngLink").textContent = t("downloadPng");
+        $("pdfLink").textContent = t("downloadPdf");
+        $("statusMessage").textContent = state.statusKey ? t(state.statusKey) : "";
+        if (state.lastResult) {
+          $("resultMeta").innerHTML = escapeHtml(state.lastResult.exhibitor_name) + " · " + escapeHtml(state.lastResult.booth_code) + "<br />" + t("expires", { expires: escapeHtml(state.lastResult.expires_at) });
+        }
+      }
+      function fillSelect(id, items, valueKey, labelKey) { $(id).innerHTML = items.map((item) => `<option value="${escapeHtml(item[valueKey])}">${escapeHtml(item[labelKey])}</option>`).join(""); }
+      async function loadOptions() {
+        if (!state.options) {
+          const response = await fetch("/api/qr/options");
+          if (!response.ok) throw new Error("OPTIONS");
+          state.options = await response.json();
+          fillSelect("eventSelect", state.options.events, "id", "name");
+          fillSelect("exhibitorSelect", state.options.exhibitors, "id", "name");
+          fillSelect("boothSelect", state.options.booths, "code", "name");
+          fillSelect("campaignSelect", state.options.campaigns, "id", "name");
+        }
+        await loadHistory();
+      }
+      async function loadHistory() {
+        const response = await fetch("/api/qr/status?event_id=" + encodeURIComponent($("eventSelect").value));
+        if (!response.ok) throw new Error("STATUS");
+        const data = await response.json();
+        const items = data.items || [];
+        $("history").hidden = !items.length;
+        $("historyRows").innerHTML = items.map((item) => `<div class="history-row"><strong>${escapeHtml(item.exhibitor_name)} · ${escapeHtml(item.booth_code)}</strong><span>${escapeHtml(item.status === "ACTIVE" ? t("active") : item.status)}</span></div>`).join("");
+      }
+      async function generateQr() {
+        const button = $("generateButton");
+        button.disabled = true; button.textContent = t("generating"); $("statusMessage").textContent = "";
+        try {
+          const response = await fetch("/api/qr/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ event_id: $("eventSelect").value, exhibitor_id: $("exhibitorSelect").value, booth_code: $("boothSelect").value, campaign_id: $("campaignSelect").value, base_url: $("baseUrlInput").value.trim() || window.location.origin + "/" }) });
+          if (!response.ok) throw new Error("GENERATE");
+          const result = await response.json();
+          state.lastResult = result;
+          state.statusKey = "generated";
+          $("qrImage").src = result.png_url; $("qrImage").alt = result.exhibitor_name + " " + result.booth_code; $("qrImage").hidden = false; $("qrEmpty").hidden = true; $("result").hidden = false; $("resultStatus").textContent = t("active"); $("resultMeta").innerHTML = escapeHtml(result.exhibitor_name) + " · " + escapeHtml(result.booth_code) + "<br />" + t("expires", { expires: escapeHtml(result.expires_at) }); $("resultUrl").textContent = result.join_url; $("pngLink").href = result.png_url; $("pdfLink").href = result.pdf_url; $("statusMessage").textContent = t("generated"); await loadHistory();
+        } catch (error) { state.statusKey = "serverError"; $("statusMessage").textContent = t("serverError"); }
+        button.disabled = false; button.textContent = t("generate");
+      }
+      $("languageButton").addEventListener("click", () => { state.language = state.language === "zh" ? "en" : "zh"; applyLanguage(); loadHistory().catch(() => {}); });
+      $("visitorButton").addEventListener("click", () => { window.location.href = "/"; });
+      $("generateButton").addEventListener("click", generateQr);
+      $("eventSelect").addEventListener("change", () => loadHistory().catch(() => {}));
+      $("baseUrlInput").value = window.location.origin + "/";
+      applyLanguage();
+      loadOptions().catch(() => { $("statusMessage").textContent = t("serverError"); });
+    </script>
+  </body>
+</html>
