@@ -73,7 +73,19 @@ Open → enter/default pet description → choose mode/ratio → Generate
 → progress state → completed state → 8-shot story result
 ```
 
-The page is intentionally a local demo surface. It does not claim to create a real MP4 until a real video provider is connected in a later scope.
+The page is intentionally a local demo surface. It creates a deterministic local MP4 through the local renderer and does not claim to use a real AI video provider.
+
+## Local video return and quota check
+
+Verified against `python webui/server.py`:
+
+- Text-only submission returned HTTP `201`, `returned_to_user: true`, a `video_url`, and a `download_url`.
+- The returned video endpoint served HTTP `200` with `Content-Type: video/mp4`; download mode returned an attachment filename.
+- A second successful submission for the same local visitor returned HTTP `429` with `DAILY_VIDEO_LIMIT`.
+- A request containing three images returned HTTP `400`; the accepted maximum is two images.
+- The response exposes only generation status, playback/download URLs, and quota counters; submitted text and image bytes are not echoed.
+
+The local limit is a demo guard keyed by a browser-local visitor id. It is not production authentication or a cross-device identity system.
 
 ## Prompt board check
 

@@ -312,6 +312,8 @@
       .primary-button:disabled { cursor: wait; filter: saturate(0.55); opacity: 0.72; transform: none; }
 
       .error-message { min-height: 19px; margin: 9px 0 0; color: var(--coral); font-size: 13px; }
+      .quota-hint, .quota-status { margin: 10px 0 0; color: var(--soft); font-size: 12px; line-height: 1.5; }
+      .quota-status { color: var(--mint); font-weight: 700; }
 
       .result-card { min-height: 570px; padding: 25px; overflow: hidden; }
 
@@ -355,6 +357,12 @@
       .result-actions { display: flex; align-items: center; gap: 10px; }
       .secondary-button { flex: 1; min-height: 44px; border: 1px solid var(--line); border-radius: 12px; background: rgba(4, 12, 24, 0.25); color: #dce5f0; font-size: 14px; font-weight: 700; }
       .secondary-button:hover { border-color: rgba(153, 246, 198, 0.55); }
+      .video-return { margin: 15px 0 20px; padding: 12px; border: 1px solid rgba(153, 246, 198, 0.24); border-radius: 15px; background: rgba(4, 12, 24, 0.32); }
+      .video-return[hidden] { display: none; }
+      .video-return video { display: block; width: 100%; max-height: 330px; border-radius: 10px; background: #050b15; object-fit: contain; }
+      .video-return-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
+      .video-return-actions a { color: var(--mint); font-size: 13px; font-weight: 800; text-decoration: none; }
+      .video-return-actions span { color: var(--soft); font-size: 12px; }
 
       .storyboard-card { grid-column: 1 / -1; padding: 25px; }
       .storyboard-card[hidden] { display: none; }
@@ -506,7 +514,7 @@
             </label>
           </div>
           <input id="qrInput" class="file-input-hidden" type="file" accept="image/*" capture="environment" />
-          <input id="photoInput" class="file-input-hidden" type="file" accept="image/*" capture="environment" />
+          <input id="photoInput" class="file-input-hidden" type="file" accept="image/*" capture="environment" multiple />
           <span id="entryStatus" class="entry-status"></span>
 
           <section class="surface session-panel" aria-labelledby="sessionTitle">
@@ -581,6 +589,7 @@
               </label>
             </div>
 
+            <p id="generationQuotaHint" class="quota-hint">每天可生成 1 次视频；本次最多 2 张图片。</p>
             <button id="generateButton" class="primary-button" type="button">生成我的宠物电影&nbsp; →</button>
           </div>
         </section>
@@ -619,6 +628,14 @@
               <h3><span id="petName">你的宠物</span><span id="successSuffix">的电影完成了</span></h3>
               <p id="successMeta">8 个镜头 · 手机竖屏 · 展位播放已开启</p>
             </div>
+            <div id="videoReturn" class="video-return" hidden>
+              <video id="resultVideo" controls playsinline preload="metadata"></video>
+              <div class="video-return-actions">
+                <a id="downloadVideoLink" href="#" download>下载视频</a>
+                <span id="videoReturnStatus"></span>
+              </div>
+            </div>
+            <p id="quotaStatus" class="quota-status"></p>
             <div id="sceneList" class="scene-list" aria-label="故事镜头"></div>
             <div class="result-actions">
               <button id="previewButton" class="secondary-button" type="button">预览故事</button>
@@ -754,7 +771,16 @@
         ["Arrange 8 story shots", "Connecting the action order"],
         ["Finish local demo", "Preparing the viewing result"],
       ];
-      const state = { mode: "animation", ratio: "9:16", language: "zh", generating: false, completed: false, progressIndex: 0, photoName: "", photoFile: null, entryMessageKey: "", entryMessageValue: {}, apiStatusKey: "", session: { status: "idle", mode: "local-demo", joinCode: "", errorKey: "" } };
+      const state = { mode: "animation", ratio: "9:16", language: "zh", generating: false, completed: false, progressIndex: 0, photoName: "", photoFile: null, photoFiles: [], visitorId: "", quota: null, lastGeneration: null, entryMessageKey: "", entryMessageValue: {}, apiStatusKey: "", session: { status: "idle", mode: "local-demo", joinCode: "", errorKey: "" } };
+      try {
+        state.visitorId = localStorage.getItem("sayelf-pet-story-agent.visitor") || "";
+        if (!state.visitorId) {
+          state.visitorId = "visitor-" + (window.crypto && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2));
+          localStorage.setItem("sayelf-pet-story-agent.visitor", state.visitorId);
+        }
+      } catch (error) {
+        state.visitorId = "visitor-" + Math.random().toString(36).slice(2);
+      }
       const $ = (id) => document.getElementById(id);
       let qrManagerOptions = null;
       const translations = {
@@ -774,7 +800,8 @@
           progressAria: "生成进度", sceneAria: "故事镜头", successReady: "已准备好", preview: "预览故事", again: "再生成一次",
           storyboardStep: "03 / PROMPT BOARD", storyboardTitle: "图片与视频分镜", storyboardDescription: "每个故事节点对应一张图片和一条视频分镜，顺序保持一致。",
           countImages: "张图片", countVideos: "条视频分镜", copyVideo: "复制全部视频分镜 Prompt", imagePrompt: "图片 Prompt", videoPrompt: "视频分镜 Prompt", copy: "复制", copyAll: "汇总复制", videoNote: "视频分镜支持一次性汇总复制；图片 Prompt 可按单张复制。",
-          footerPilot: "Pet Expo Pilot 01 本地演示", descriptionError: "写一句宠物描述或拍摄一张照片，再开始生成。", imageCopied: "图片 Prompt 已复制", videoCopied: "全部视频分镜 Prompt 已复制", copyFailed: "复制没有成功，请手动选择 Prompt 文本。", previewDemo: "演示预览已准备好；真实视频文件将在后续 provider 接入后播放。",
+          quotaHint: "每天可生成 1 次视频；本次最多 2 张图片。", quotaStatus: "今日视频 {videosUsed}/{videoLimit} · 图片 {imagesUsed}/{imageLimit}", videoReturned: "后台已生成并回传视频", downloadVideo: "下载视频", dailyVideoLimit: "今天的视频已生成，请明天再来。", dailyImageLimit: "今天最多可以使用 2 张图片。", generationServerError: "后台生成失败，请稍后重试。",
+          footerPilot: "Pet Expo Pilot 01 本地演示", descriptionError: "写一句宠物描述或拍摄一张照片，再开始生成。", imageCopied: "图片 Prompt 已复制", videoCopied: "全部视频分镜 Prompt 已复制", copyFailed: "复制没有成功，请手动选择 Prompt 文本。", previewDemo: "视频已经回传到当前页面，可直接播放或下载。",
           photoSelected: "已选择图片：{name}", photoReady: "图片已准备好：{name}", qrRead: "已读取二维码：{value}", qrNoCode: "没有识别到二维码，请重试。", qrFallback: "二维码入口已打开；当前浏览器需要使用支持扫码的相机或二维码图片。",
           apiStep: "MODEL CONNECTION", apiTitle: "大模型 API 接入", apiDescription: "配置生成服务的入口，当前只保存在本页。", apiNote: "本地演示不会上传或保存 API Key，也不会自动调用外部服务。",
           apiProvider: "服务商", apiEndpoint: "Endpoint", apiModel: "模型名称", apiPlaceholder: "https://api.example.com/v1", modelPlaceholder: "video-model", close: "关闭", cancel: "取消", saveApi: "保存本页配置", apiSaved: "配置已保存在当前页面，未发送到外部服务。", apiAria: "关闭 API 接入设置", footerBrand: "HappyPet · Smart Motion Ball", successMeta: "8 个镜头 · {ratio} · 展位播放{consent}", consentOn: "已开启", consentOff: "未开启", providerOpenAI: "OpenAI-compatible", providerLocal: "本地 Endpoint", providerCustom: "自定义服务商",
@@ -797,7 +824,8 @@
           progressAria: "Generation progress", sceneAria: "Story shots", successReady: "Ready to view", preview: "Preview story", again: "Generate again",
           storyboardStep: "03 / PROMPT BOARD", storyboardTitle: "Image and video storyboard", storyboardDescription: "Each story beat has one image and one video shot, kept in the same order.",
           countImages: "images", countVideos: "video shots", copyVideo: "Copy all video storyboard Prompts", imagePrompt: "Image Prompt", videoPrompt: "Video storyboard Prompt", copy: "Copy", copyAll: "Included in summary", videoNote: "Copy all video storyboard Prompts at once; copy image Prompts one by one.",
-          footerPilot: "Pet Expo Pilot 01 · Local demo", descriptionError: "Add a pet description or take a photo before generating.", imageCopied: "Image Prompt copied", videoCopied: "All video storyboard Prompts copied", copyFailed: "Copy did not succeed. Please select the Prompt text manually.", previewDemo: "The demo preview is ready; a real video file will play after a provider is connected.",
+          quotaHint: "One video per day; up to 2 images in this request.", quotaStatus: "Today: videos {videosUsed}/{videoLimit} · images {imagesUsed}/{imageLimit}", videoReturned: "Video generated and returned by the backend", downloadVideo: "Download video", dailyVideoLimit: "Today's video is already generated. Please come back tomorrow.", dailyImageLimit: "Up to 2 images can be used today.", generationServerError: "Backend generation failed. Please try again.",
+          footerPilot: "Pet Expo Pilot 01 · Local demo", descriptionError: "Add a pet description or take a photo before generating.", imageCopied: "Image Prompt copied", videoCopied: "All video storyboard Prompts copied", copyFailed: "Copy did not succeed. Please select the Prompt text manually.", previewDemo: "The video has been returned to this page and can be played or downloaded.",
           photoSelected: "Photo selected: {name}", photoReady: "Photo ready: {name}", qrRead: "QR code read: {value}", qrNoCode: "No QR code found. Please try again.", qrFallback: "The QR entry is open; this browser needs a camera or QR image scanner that supports detection.",
           apiStep: "MODEL CONNECTION", apiTitle: "Connect a model API", apiDescription: "Configure a generation service entry; it stays on this page for now.", apiNote: "This local demo does not upload or save an API key and will not call an external service automatically.",
           apiProvider: "Provider", apiEndpoint: "Endpoint", apiModel: "Model name", apiPlaceholder: "https://api.example.com/v1", modelPlaceholder: "video-model", close: "Close", cancel: "Cancel", saveApi: "Save on this page", apiSaved: "Configuration is kept on this page and was not sent externally.", apiAria: "Close API connection settings", footerBrand: "HappyPet · Smart Motion Ball", successMeta: "8 shots · {ratio} · Hall playback {consent}", consentOn: "on", consentOff: "off", providerOpenAI: "OpenAI-compatible", providerLocal: "Local endpoint", providerCustom: "Custom provider",
@@ -828,7 +856,7 @@
           eyebrow: "eyebrow", introCopy: "introCopy", scanQrTitle: "scanQrTitle", scanQrHint: "scanQrHint", photoTitle: "photoTitle", photoHint: "photoHint",
           petSectionStep: "petSectionStep", petSectionTitle: "petSectionTitle", localDemo: "localDemoBadge", petLabel: "petDescriptionLabel",
           modeLabel: "modeLabel", modeHint: "modeHint", ratioLabel: "ratioLabel", ratioHint: "ratioHint", consentTitle: "consentTitle", consentHint: "consentHint", petLabel: "petDescriptionLabelText",
-          resultStep: "resultStep", resultTitle: "result-title", resultDescription: "resultDescription", readyTitle: "readyTitle", readyCopy: "readyCopy",
+          resultStep: "resultStep", resultTitle: "result-title", resultDescription: "resultDescription", readyTitle: "readyTitle", readyCopy: "readyCopy", generationQuotaHint: "generationQuotaHint",
           storyboardStep: "storyboardStep", storyboardTitle: "storyboardTitle", storyboardDescription: "storyboardDescription",
           copyVideo: "copyVideoPromptsButton", videoNote: "videoSummaryNote", footerBrand: "footerBrand", footerPilot: "footerPilot",
           apiStep: "apiModalStep", apiTitle: "apiModalTitle", apiDescription: "apiModalDescription", apiNote: "apiNote", apiProvider: "apiProviderLabel",
@@ -858,6 +886,7 @@
         $("qrResultTitle").textContent = t("qrResultTitle");
         $("downloadPngLink").textContent = t("downloadPng");
         $("downloadPdfLink").textContent = t("downloadPdf");
+        $("downloadVideoLink").textContent = t("downloadVideo");
         $("qrBaseUrlInput").placeholder = t("qrBaseUrlPlaceholder");
         $("closeQrManagerButton").setAttribute("aria-label", t("qrAdminAria"));
         renderSession();
@@ -876,6 +905,8 @@
           const ratioLabel = state.ratio === "9:16" ? t("portrait") : t("landscape");
           $("successMeta").textContent = t("successMeta", { ratio: ratioLabel, consent: $("hallConsent").checked ? t("consentOn") : t("consentOff") });
         }
+        if (state.lastGeneration) $("videoReturnStatus").textContent = t("videoReturned");
+        renderQuota();
         if (state.photoName) $("entryStatus").textContent = t("photoReady", { name: state.photoName });
         else if (state.entryMessageKey) $("entryStatus").textContent = t(state.entryMessageKey, state.entryMessageValue);
         else $("entryStatus").textContent = "";
@@ -1180,12 +1211,74 @@
         button.textContent = "重新生成我的宠物电影　→";
       }
 
-      function startGeneration() {
+      function fileToDataUrl(file) {
+        return new Promise(function (resolve, reject) {
+          const reader = new FileReader();
+          reader.onload = function () { resolve(String(reader.result)); };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      async function submitGeneration(inputText) {
+        const selectedFiles = (state.photoFiles.length ? state.photoFiles : state.photoFile ? [state.photoFile] : []).slice(0, 2);
+        const images = await Promise.all(selectedFiles.map(async function (file) {
+          return { name: file.name, mime_type: file.type, data_url: await fileToDataUrl(file) };
+        }));
+        const response = await fetch("/api/generation/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            visitor_id: state.visitorId,
+            idempotency_key: "generation-" + Date.now() + "-" + Math.random().toString(36).slice(2),
+            input_text: inputText,
+            images: images,
+            aspect_ratio: state.ratio,
+            mode: state.mode
+          })
+        });
+        const payload = await response.json();
+        if (!response.ok) {
+          const error = new Error(payload.error || "GENERATION_FAILED");
+          error.payload = payload;
+          throw error;
+        }
+        return payload;
+      }
+
+      async function loadQuota() {
+        try {
+          const response = await fetch("/api/generation/quota?visitor_id=" + encodeURIComponent(state.visitorId));
+          if (!response.ok) return;
+          state.quota = await response.json();
+          renderQuota();
+        } catch (error) {
+          // The form remains usable if a local quota read is temporarily unavailable.
+        }
+      }
+
+      function renderQuota() {
+        if (!state.quota) return;
+        $("quotaStatus").textContent = t("quotaStatus", {
+          videosUsed: state.quota.videos_used,
+          videoLimit: state.quota.video_limit,
+          imagesUsed: state.quota.images_used,
+          imageLimit: state.quota.image_limit
+        });
+        if (!state.generating && !state.completed) $("generateButton").disabled = state.quota.videos_remaining <= 0;
+      }
+
+      async function startGeneration() {
         const description = $("petDescription").value.trim();
         $("descriptionError").textContent = "";
-        if (!description && !state.photoFile) {
+        const hasImages = state.photoFiles.length > 0 || Boolean(state.photoFile);
+        if (!description && !hasImages) {
           $("descriptionError").textContent = t("descriptionError");
           $("petDescription").focus();
+          return;
+        }
+        if (state.quota && state.quota.videos_remaining <= 0) {
+          $("descriptionError").textContent = t("dailyVideoLimit");
           return;
         }
         const button = $("generateButton");
@@ -1195,33 +1288,59 @@
         button.disabled = true;
         button.innerHTML = t("generating") + "…";
         $("statusPill").textContent = t("statusProgress");
+        $("videoReturn").hidden = true;
         setState("progressState");
         renderProgressSteps(0);
         let progress = 0;
         const timer = window.setInterval(function () {
-          progress += 25;
+          progress = Math.min(progress + 15, 90);
           state.progressIndex = Math.min(Math.floor(progress / 34), 2);
           const activeSteps = state.language === "en" ? stepsEn : steps;
           $("progressFill").style.width = progress + "%";
           $("progressValue").textContent = progress + "%";
           $("progressLabel").textContent = activeSteps[state.progressIndex][0];
           renderProgressSteps(state.progressIndex);
-          if (progress >= 100) {
-            window.clearInterval(timer);
-            finishGeneration(description);
-          }
         }, 650);
+        try {
+          const result = await submitGeneration(description);
+          window.clearInterval(timer);
+          $("progressFill").style.width = "100%";
+          $("progressValue").textContent = "100%";
+          state.progressIndex = 2;
+          renderProgressSteps(2);
+          finishGeneration(description, result);
+        } catch (error) {
+          window.clearInterval(timer);
+          state.generating = false;
+          state.completed = false;
+          $("statusPill").textContent = t("statusReady");
+          setState("readyState");
+          button.disabled = false;
+          button.innerHTML = t("generate");
+          const code = error.payload && error.payload.error;
+          $("descriptionError").textContent = code === "DAILY_VIDEO_LIMIT" ? t("dailyVideoLimit") : code === "DAILY_IMAGE_LIMIT" ? t("dailyImageLimit") : t("generationServerError");
+          if (error.payload && error.payload.quota) {
+            state.quota = error.payload.quota;
+            renderQuota();
+          }
+        }
       }
 
-      function finishGeneration(description) {
+      function finishGeneration(description, result) {
         const button = $("generateButton");
         const consent = $("hallConsent").checked;
         const ratioLabel = state.ratio === "9:16" ? t("portrait") : t("landscape");
         state.generating = false;
         state.completed = true;
+        state.lastGeneration = result;
+        state.quota = result.quota || state.quota;
         const petTitle = description || (state.language === "en" ? "Your pet" : "你的宠物");
         $("petName").textContent = petTitle.length > 18 ? petTitle.slice(0, 18) + "…" : petTitle;
         $("successMeta").textContent = t("successMeta", { ratio: ratioLabel, consent: consent ? t("consentOn") : t("consentOff") });
+        $("resultVideo").src = result.video_url;
+        $("downloadVideoLink").href = result.download_url;
+        $("videoReturnStatus").textContent = t("videoReturned");
+        $("videoReturn").hidden = false;
         renderScenes();
         renderStoryboard();
         $("storyboardPanel").hidden = false;
@@ -1229,6 +1348,7 @@
         setState("successState");
         button.disabled = false;
         button.innerHTML = t("regenerate");
+        renderQuota();
       }
 
       document.querySelectorAll("[data-choice-group]").forEach((button) => {
@@ -1250,9 +1370,13 @@
 
       $("againButton").addEventListener("click", () => {
         state.completed = false;
+        state.lastGeneration = null;
+        $("videoReturn").hidden = true;
+        $("resultVideo").removeAttribute("src");
         setState("readyState");
         $("storyboardPanel").hidden = true;
         $("statusPill").textContent = t("statusReady");
+        renderQuota();
         window.scrollTo({ top: 0, behavior: "smooth" });
       });
 
@@ -1265,13 +1389,14 @@
       });
 
       $("photoInput").addEventListener("change", function (event) {
-        const file = event.target.files && event.target.files[0];
-        if (!file) return;
-        state.photoName = file.name;
-        state.photoFile = file;
+        const files = Array.from(event.target.files || []).slice(0, 2);
+        if (!files.length) return;
+        state.photoFiles = files;
+        state.photoFile = files[0];
+        state.photoName = files.map(function (file) { return file.name; }).join("、");
         state.entryMessageKey = "";
         applyLanguage();
-        showToast(t("photoReady", { name: file.name }));
+        showToast(t("photoReady", { name: state.photoName }));
         event.target.value = "";
       });
 
@@ -1280,6 +1405,8 @@
         const file = event.target.files && event.target.files[0];
         if (!file) return;
         state.photoName = "";
+        state.photoFile = null;
+        state.photoFiles = [];
         state.entryMessageKey = "qrFallback";
         state.entryMessageValue = {};
         if ("BarcodeDetector" in window && typeof createImageBitmap === "function") {
@@ -1357,6 +1484,7 @@
       });
 
       applyLanguage();
+      loadQuota();
       autoJoinFromUrl();
     </script>
   </body>

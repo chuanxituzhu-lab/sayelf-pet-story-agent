@@ -81,3 +81,11 @@ Python 3.11+ 标准库、`src/` package layout、`unittest`、JSONL ledger、dat
 ## Explicitly not building
 
 不做 Sprint 02；不做真实视频生成、Prompt 编排、Shot QA、Final Assembly、队列/并发、数据库、真实 Agent 网关、服务端文件上传、真实鉴权实现、支付、云存储、外部分享接口、真实大模型 API 调用、API Key 持久化、hall 播放器和 analytics dashboard。二维码接入只做到本地 mock handshake 与真实网关契约，不声称已连接当前 Codex 对话。
+
+## WebUI generation-return addendum
+
+本次用户需求将 WebUI 的最小闭环从“浏览器模拟进度”改善为“本地提交 → 本地渲染 → 当前页面回传”。决策分类为 **Improve**：保留原有普通用户交互，不引入数据库、队列或云 provider，只增加一个本地 generation endpoint、受限的本地 MP4 renderer、幂等键和按访客/日期的额度保护。
+
+- Success evidence：文字请求 `201` 并返回 `video_url` / `download_url`；视频端点返回 `video/mp4`；同一访客第二次返回 `429 DAILY_VIDEO_LIMIT`；三张图片请求返回 `400`。
+- Data boundary：文字、图片和生成资产留在本机 `.local/`；接口响应不回显原始输入；公开仓库不包含运行时生成文件、访客内容或 API Key。
+- Explicit boundary：当前视频是本地 deterministic demo renderer，不声称是真实 AI 视频生成；真实 provider、生产身份、跨设备额度和云端回传继续不做。

@@ -49,8 +49,9 @@ python -m sayelf_pet_story_agent
 - 未完成扫码验证前隐藏宠物录入步骤；接入成功后展开「拍摄宠物照片」和 `01 / PET INTAKE`。
 - 会话接入契约规定短时一次性 join token、服务端验证、幂等消息回执和明确的失败状态。
 - 模型 API 接入设置入口；当前只展示配置界面，不保存或发送 API Key，也不调用外部服务。
+- 用户提交的文字、单张或最多两张图片会通过本地 WebUI 后端生成 3 秒本地演示 MP4，并回传到当前页面播放和下载；同一访客每天最多成功生成 1 次视频，图片输入累计最多 2 张。
 
-已提供一个不依赖构建工具的单页界面：`webui/index.html`。它展示普通用户的输入、生成进度、8 镜头结果和展位播放授权；当前为本地演示，不连接真实视频 provider。
+已提供一个不依赖构建工具的单页界面：`webui/index.html`。它展示普通用户的输入、生成进度、8 镜头结果和展位播放授权。`webui/server.py` 提供本地生成接口与视频回传；视频由本地 ffmpeg 演示渲染器生成，不代表已接入真实 AI 视频 provider。
 
 ### QR → Agent 会话边界
 
@@ -69,8 +70,15 @@ python webui/server.py
 
 后台二维码控制台为 `http://localhost:8080/admin.html`：可选择活动、参展商和展位，生成本地二维码并下载 PNG / PDF，同时查看二维码状态和历史。后台页不提供“扫码进入”按钮；游客体验页仍为 `http://localhost:8080/`，供手机访问二维码后的会话与宠物录入使用。已生成二维码的状态保存在本地 `webui/.local/`，不会进入公共发布内容。
 
+## 生成回传与额度边界
+
+- 后端只接受本机 WebUI 的生成请求，不把文字、图片或生成文件发送到外部服务。
+- `visitor_id` 仅用于本地演示额度记录；换设备或清理本地存储后会产生新的访客标识，生产环境应替换为真实会话身份。
+- 额度按本机日期计算：每天 1 次视频；图片输入累计最多 2 张。失败渲染会释放本次额度，成功结果可通过返回的播放地址和下载地址读取。
+- 这是可验证的本地 Mock 生成闭环；真实大模型视频质量、云 provider、鉴权和跨设备回传仍未接入。
+
 ## 验收边界
 
-本 Sprint 不包含真实视频服务、Prompt 编排、Shot QA、Final Assembly、并发队列、数据库、真实 Agent 网关、外部文件上传、云存储、外部分享、hall 播放器和 analytics。这些属于后续冻结阶段，Sprint 01 完成后停止。WebUI 仅保留本地演示和接入契约验证。
+本 Sprint 不包含真实视频服务、Prompt 编排、Shot QA、Final Assembly、并发队列、数据库、真实 Agent 网关、云存储、外部分享、hall 播放器和 analytics。这些属于后续冻结阶段，Sprint 01 完成后停止。当前新增的生成回传仍是本地 Mock 闭环，不扩展为真实 provider 或云端生产链路。
 
 详细 Build Decision Record 见 [`BUILD_DECISION_RECORD.md`](BUILD_DECISION_RECORD.md)。
