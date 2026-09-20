@@ -1,8 +1,8 @@
-# Pet FDE Build 0.1 — Sprint 01 Build Decision Record
+# sayelf-pet-story-agent Build 0.1 — Sprint 01 Build Decision Record
 
 ## Idea / real task
 
-把已冻结的 Phase 21–26 架构落成可运行的 Pet FDE Build 0.1 最小工程骨架：领域模型、Session/Job 状态机、append-only Event Ledger、Pilot 01 fixture、统一视频 provider adapter、最小测试与启动说明。
+把已冻结的 Phase 21–26 架构落成可运行的 sayelf-pet-story-agent Build 0.1 最小工程骨架：领域模型、Session/Job 状态机、append-only Event Ledger、Pilot 01 fixture、统一视频 provider adapter、最小测试与启动说明。
 
 ## Closest existing projects or capabilities
 

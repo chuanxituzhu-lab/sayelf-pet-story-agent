@@ -1,7 +1,7 @@
-# SAYELF Pet Story Agent — Build 0.1 / Sprint 01
+# sayelf-pet-story-agent — Build 0.1 / Sprint 01
 
 Repository: `sayelf-pet-story-agent`
-Internal Python package: `pet_fde`
+Internal Python package: `sayelf_pet_story_agent`
 
 这是 Phase 21–26 冻结架构的第一段实际工程骨架。它采用本地优先的 Modular Monolith，只实现 Sprint 01 的最小可验收切片。
 
@@ -22,7 +22,7 @@ Internal Python package: `pet_fde`
 
 ```text
 python -m unittest discover -s tests -v
-python -m pet_fde
+python -m sayelf_pet_story_agent
 ```
 
 如果尚未安装 package，可使用项目根目录的 `PYTHONPATH` 方式运行：
@@ -30,10 +30,10 @@ python -m pet_fde
 ```text
 $env:PYTHONPATH = "src"
 python -m unittest discover -s tests -v
-python -m pet_fde
+python -m sayelf_pet_story_agent
 ```
 
-普通用户只需看到测试通过或 `Pet FDE Pilot 01: READY`；JSON、Prompt、provider/API 细节留在内部 contract 和测试中。
+普通用户只需看到测试通过或 `sayelf-pet-story-agent Pilot 01: READY`；JSON、Prompt、provider/API 细节留在内部 contract 和测试中。
 
 ## WebUI / HTML 演示
 

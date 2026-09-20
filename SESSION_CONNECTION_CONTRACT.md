@@ -1,14 +1,14 @@
-# Pet FDE Agent Session Connection Contract
+# sayelf-pet-story-agent Agent Session Connection Contract
 
 ## Purpose
 
-二维码用于把现场访客带入一次 Pet FDE Agent 会话。二维码本身不是会话，也不携带宠物图片、输入文字或 API Key；它只携带一个短时、一次性的加入凭证。
+二维码用于把现场访客带入一次 sayelf-pet-story-agent Agent 会话。二维码本身不是会话，也不携带宠物图片、输入文字或 API Key；它只携带一个短时、一次性的加入凭证。
 
 当前 Sprint 01 的 WebUI 只实现本地 mock handshake，用于验证用户路径和状态变化。真实 Agent 接入需要由受信任的会话网关实现下面的接口。
 
 ## QR payload
 
-推荐使用 HTTPS URL；本地演示也接受 `petfde://join`：
+推荐使用 HTTPS URL；本地演示也接受 `sayelf-pet-story-agent://join`：
 
 ```text
 https://agent.example/join?event=event-pilot-01&booth=A17&join_token=<opaque>&exp=<unix>&nonce=<opaque>&sig=<signature>
@@ -30,7 +30,7 @@ Idempotency-Key: <device-join-attempt>
 {
   "join_token": "<opaque>",
   "device_nonce": "<new-client-value>",
-  "client_version": "pet-fde-webui-0.1"
+  "client_version": "sayelf-pet-story-agent-webui-0.1"
 }
 ```
 

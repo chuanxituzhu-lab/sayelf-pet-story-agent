@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Mapping
 from uuid import uuid4
 
-from pet_fde.domain.models import LedgerEvent, utc_now
+from sayelf_pet_story_agent.domain.models import LedgerEvent, utc_now
 
 
 class AppendOnlyEventLedger:

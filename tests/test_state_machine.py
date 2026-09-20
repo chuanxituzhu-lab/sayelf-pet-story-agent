@@ -1,7 +1,7 @@
 import unittest
 
-from pet_fde.domain.models import Job, JobStatus, Session, SessionStatus, VideoMode
-from pet_fde.domain.state_machine import InvalidTransition, JobStateMachine, SessionStateMachine
+from sayelf_pet_story_agent.domain.models import Job, JobStatus, Session, SessionStatus, VideoMode
+from sayelf_pet_story_agent.domain.state_machine import InvalidTransition, JobStateMachine, SessionStateMachine
 
 
 class StateMachineTests(unittest.TestCase):

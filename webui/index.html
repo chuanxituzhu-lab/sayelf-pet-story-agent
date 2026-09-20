@@ -6,9 +6,9 @@
     <meta name="theme-color" content="#0b1220" />
     <meta
       name="description"
-      content="Pet FDE · My Pet Movie 本地演示界面"
+      content="sayelf-pet-story-agent · My Pet Movie 本地演示界面"
     />
-    <title>Pet FDE · My Pet Movie</title>
+    <title>sayelf-pet-story-agent · My Pet Movie</title>
     <link
       rel="icon"
       type="image/svg+xml"
@@ -465,10 +465,10 @@
   <body>
     <div class="app-shell">
       <header class="topbar">
-        <div class="brand" aria-label="Pet FDE">
+        <div class="brand" aria-label="sayelf-pet-story-agent">
           <img class="brand-mark" src="assets/sayelf-logo.png" alt="SAYELF 山野精灵" />
           <div>
-            <div class="brand-name">Pet FDE</div>
+            <div class="brand-name">sayelf-pet-story-agent</div>
             <div id="brandSubtitle" class="brand-subtitle">宠物会展内容体验</div>
           </div>
         </div>
@@ -600,7 +600,7 @@
               <div>
                 <div class="empty-icon" aria-hidden="true">◌</div>
                 <h3 id="readyTitle">故事还在等你开始</h3>
-                <p id="readyCopy">完成左侧输入后，Pet FDE 会按固定的 8 个镜头为它安排一次小小的冒险。</p>
+                <p id="readyCopy">完成左侧输入后，sayelf-pet-story-agent 会按固定的 8 个镜头为它安排一次小小的冒险。</p>
               </div>
             </div>
           </div>
@@ -703,7 +703,7 @@
             <div class="modal-field"><label id="qrExhibitorLabel" for="qrExhibitorSelect">参展商</label><select id="qrExhibitorSelect"></select></div>
             <div class="modal-field"><label id="qrBoothLabel" for="qrBoothSelect">展位</label><select id="qrBoothSelect"></select></div>
             <div class="modal-field"><label id="qrCampaignLabel" for="qrCampaignSelect">活动内容</label><select id="qrCampaignSelect"></select></div>
-            <div class="modal-field"><label id="qrBaseUrlLabel" for="qrBaseUrlInput">游客打开地址</label><input id="qrBaseUrlInput" type="url" placeholder="https://petfde.example/" /></div>
+            <div class="modal-field"><label id="qrBaseUrlLabel" for="qrBaseUrlInput">游客打开地址</label><input id="qrBaseUrlInput" type="url" placeholder="https://sayelf-pet-story-agent.example/" /></div>
             <button id="generateQrButton" class="primary-button" type="button">生成二维码</button>
             <p id="qrManagerStatus" class="qr-manager-status"></p>
           </div>
@@ -760,7 +760,7 @@
       const translations = {
         zh: {
           brandSubtitle: "宠物会展内容体验", pilotBadge: "Pet Expo Pilot 01", apiButton: "模型 API", languageButton: "EN",
-          pageTitle: "Pet FDE · 我的宠物电影", metaDescription: "Pet FDE · My Pet Movie 本地演示界面", inputEntry: "输入入口", storyFlow: "故事流程", qrFileAria: "选择二维码图片", photoFileAria: "选择宠物照片",
+          pageTitle: "sayelf-pet-story-agent · 我的宠物电影", metaDescription: "sayelf-pet-story-agent · My Pet Movie 本地演示界面", inputEntry: "输入入口", storyFlow: "故事流程", qrFileAria: "选择二维码图片", photoFileAria: "选择宠物照片",
           eyebrow: "HAPPYPET · MY PET MOVIE", titleHtml: "让毛孩子成为<br /><span>电影主角</span>", introCopy: "留下一个简单的描述，选择你喜欢的电影感，现场生成一支属于它的短片。",
           story1: "发现", story2: "靠近", story3: "追逐", story4: "反转", story5: "反应",
           scanQrTitle: "扫码进入", scanQrHint: "扫描展位二维码，打开活动入口", photoTitle: "拍摄宠物照片", photoHint: "调用相机或从相册选择图片",
@@ -770,7 +770,7 @@
           consentTitle: "允许在 HappyPet 展位播放", consentHint: "只用于本次展会现场，不影响你的分享视频", consentAria: "允许在展位播放",
           generate: "生成我的宠物电影&nbsp; →", generating: "正在生成", regenerate: "重新生成我的宠物电影　→",
           resultStep: "02 / YOUR MOVIE", resultTitle: "生成结果", resultDescription: "完成后，这里会出现你的故事预览。", successSuffix: "的电影完成了",
-          statusReady: "准备就绪", statusProgress: "进行中", statusDone: "已完成", readyTitle: "故事还在等你开始", readyCopy: "完成左侧输入后，Pet FDE 会按固定的 8 个镜头为它安排一次小小的冒险。",
+          statusReady: "准备就绪", statusProgress: "进行中", statusDone: "已完成", readyTitle: "故事还在等你开始", readyCopy: "完成左侧输入后，sayelf-pet-story-agent 会按固定的 8 个镜头为它安排一次小小的冒险。",
           progressAria: "生成进度", sceneAria: "故事镜头", successReady: "已准备好", preview: "预览故事", again: "再生成一次",
           storyboardStep: "03 / PROMPT BOARD", storyboardTitle: "图片与视频分镜", storyboardDescription: "每个故事节点对应一张图片和一条视频分镜，顺序保持一致。",
           countImages: "张图片", countVideos: "条视频分镜", copyVideo: "复制全部视频分镜 Prompt", imagePrompt: "图片 Prompt", videoPrompt: "视频分镜 Prompt", copy: "复制", copyAll: "汇总复制", videoNote: "视频分镜支持一次性汇总复制；图片 Prompt 可按单张复制。",
@@ -779,11 +779,11 @@
           apiStep: "MODEL CONNECTION", apiTitle: "大模型 API 接入", apiDescription: "配置生成服务的入口，当前只保存在本页。", apiNote: "本地演示不会上传或保存 API Key，也不会自动调用外部服务。",
           apiProvider: "服务商", apiEndpoint: "Endpoint", apiModel: "模型名称", apiPlaceholder: "https://api.example.com/v1", modelPlaceholder: "video-model", close: "关闭", cancel: "取消", saveApi: "保存本页配置", apiSaved: "配置已保存在当前页面，未发送到外部服务。", apiAria: "关闭 API 接入设置", footerBrand: "HappyPet · Smart Motion Ball", successMeta: "8 个镜头 · {ratio} · 展位播放{consent}", consentOn: "已开启", consentOff: "未开启", providerOpenAI: "OpenAI-compatible", providerLocal: "本地 Endpoint", providerCustom: "自定义服务商",
           sessionStep: "00 / AGENT SESSION", sessionTitle: "会话接入", sessionDescription: "扫码验证通过后，当前页面会自动进入本次 Agent 会话。", sessionStatusIdle: "未接入", sessionStatusVerifying: "正在验证", sessionStatusConnected: "已接入", sessionStatusError: "接入失败", sessionEmpty: "请先扫描活动二维码；接入成功后，这里会出现下一步宠物信息录入。", demoJoin: "模拟扫码接入", sessionReady: "已进入本次会话", sessionCapabilities: "下一步：01 / PET INTAKE", sessionConnectedCopy: "下面的宠物文字和图片会作为本次 Agent 任务的一条输入提交。", sessionVerifying: "正在验证二维码并建立会话…", sessionConnected: "已建立本次 Agent 会话，可以继续填写宠物信息。", sessionQrInvalid: "二维码不是有效的活动接入码。", sessionQrExpired: "二维码已过期，请重新扫描。", sessionQrReadConnecting: "已读取活动二维码，正在自动接入…",
-          qrManagerButton: "后台二维码", qrManagerStep: "EXHIBITOR QR", qrManagerTitle: "参展商二维码", qrManagerDescription: "选择活动、参展商和展位，生成现场展示二维码。", qrManagerInfo: "二维码在本机生成，加入链接包含短时 Token；不会把展位信息发送到第三方二维码网站。", qrEvent: "活动", qrExhibitor: "参展商", qrBooth: "展位", qrCampaign: "活动内容", qrBaseUrl: "游客打开地址", qrBaseUrlPlaceholder: "https://petfde.example/", generateQr: "生成二维码", qrGenerating: "正在生成…", qrPreviewEmpty: "生成后显示二维码", qrResultTitle: "二维码状态", qrActive: "有效", qrGenerated: "二维码已生成，可下载 PNG 或 PDF。", qrServerError: "二维码服务未启动，请使用本地 WebUI 启动方式。", qrHistoryTitle: "已生成二维码", downloadPng: "下载 PNG", downloadPdf: "下载 PDF", qrStatusMeta: "{exhibitor} · 展位 {booth}<br />有效期至 {expires}", qrAdminAria: "关闭二维码管理"
+          qrManagerButton: "后台二维码", qrManagerStep: "EXHIBITOR QR", qrManagerTitle: "参展商二维码", qrManagerDescription: "选择活动、参展商和展位，生成现场展示二维码。", qrManagerInfo: "二维码在本机生成，加入链接包含短时 Token；不会把展位信息发送到第三方二维码网站。", qrEvent: "活动", qrExhibitor: "参展商", qrBooth: "展位", qrCampaign: "活动内容", qrBaseUrl: "游客打开地址", qrBaseUrlPlaceholder: "https://sayelf-pet-story-agent.example/", generateQr: "生成二维码", qrGenerating: "正在生成…", qrPreviewEmpty: "生成后显示二维码", qrResultTitle: "二维码状态", qrActive: "有效", qrGenerated: "二维码已生成，可下载 PNG 或 PDF。", qrServerError: "二维码服务未启动，请使用本地 WebUI 启动方式。", qrHistoryTitle: "已生成二维码", downloadPng: "下载 PNG", downloadPdf: "下载 PDF", qrStatusMeta: "{exhibitor} · 展位 {booth}<br />有效期至 {expires}", qrAdminAria: "关闭二维码管理"
         },
         en: {
           brandSubtitle: "Pet expo content experience", pilotBadge: "Pet Expo Pilot 01", apiButton: "Model API", languageButton: "中文",
-          pageTitle: "Pet FDE · My Pet Movie", metaDescription: "Pet FDE · My Pet Movie local demo", inputEntry: "Input methods", storyFlow: "Story flow", qrFileAria: "Choose QR image", photoFileAria: "Choose pet photo",
+          pageTitle: "sayelf-pet-story-agent · My Pet Movie", metaDescription: "sayelf-pet-story-agent · My Pet Movie local demo", inputEntry: "Input methods", storyFlow: "Story flow", qrFileAria: "Choose QR image", photoFileAria: "Choose pet photo",
           eyebrow: "HAPPYPET · MY PET MOVIE", titleHtml: "Let your pet become<br /><span>the movie star</span>", introCopy: "Describe your pet, choose a film mood, and create a short story for the expo.",
           story1: "Discover", story2: "Approach", story3: "Chase", story4: "Reversal", story5: "Reaction",
           scanQrTitle: "Scan to enter", scanQrHint: "Scan the booth QR code to open the activity", photoTitle: "Take a pet photo", photoHint: "Use the camera or choose from your photos",
@@ -793,7 +793,7 @@
           consentTitle: "Allow playback at the HappyPet booth", consentHint: "Only for this expo; your shared video is unaffected", consentAria: "Allow booth playback",
           generate: "Generate my pet movie&nbsp; →", generating: "Generating", regenerate: "Generate my pet movie again　→",
           resultStep: "02 / YOUR MOVIE", resultTitle: "Your result", resultDescription: "Your story preview will appear here when it is ready.", successSuffix: "'s movie is ready",
-          statusReady: "Ready", statusProgress: "In progress", statusDone: "Complete", readyTitle: "Your story is waiting", readyCopy: "Start on the left and Pet FDE will arrange a small adventure across 8 fixed shots.",
+          statusReady: "Ready", statusProgress: "In progress", statusDone: "Complete", readyTitle: "Your story is waiting", readyCopy: "Start on the left and sayelf-pet-story-agent will arrange a small adventure across 8 fixed shots.",
           progressAria: "Generation progress", sceneAria: "Story shots", successReady: "Ready to view", preview: "Preview story", again: "Generate again",
           storyboardStep: "03 / PROMPT BOARD", storyboardTitle: "Image and video storyboard", storyboardDescription: "Each story beat has one image and one video shot, kept in the same order.",
           countImages: "images", countVideos: "video shots", copyVideo: "Copy all video storyboard Prompts", imagePrompt: "Image Prompt", videoPrompt: "Video storyboard Prompt", copy: "Copy", copyAll: "Included in summary", videoNote: "Copy all video storyboard Prompts at once; copy image Prompts one by one.",
@@ -802,7 +802,7 @@
           apiStep: "MODEL CONNECTION", apiTitle: "Connect a model API", apiDescription: "Configure a generation service entry; it stays on this page for now.", apiNote: "This local demo does not upload or save an API key and will not call an external service automatically.",
           apiProvider: "Provider", apiEndpoint: "Endpoint", apiModel: "Model name", apiPlaceholder: "https://api.example.com/v1", modelPlaceholder: "video-model", close: "Close", cancel: "Cancel", saveApi: "Save on this page", apiSaved: "Configuration is kept on this page and was not sent externally.", apiAria: "Close API connection settings", footerBrand: "HappyPet · Smart Motion Ball", successMeta: "8 shots · {ratio} · Hall playback {consent}", consentOn: "on", consentOff: "off", providerOpenAI: "OpenAI-compatible", providerLocal: "Local endpoint", providerCustom: "Custom provider",
           sessionStep: "00 / AGENT SESSION", sessionTitle: "Agent session", sessionDescription: "After QR verification, this page automatically enters the Agent session.", sessionStatusIdle: "Not connected", sessionStatusVerifying: "Verifying", sessionStatusConnected: "Connected", sessionStatusError: "Connection failed", sessionEmpty: "Scan the activity QR first; the pet intake step appears after connection.", demoJoin: "Simulate QR join", sessionReady: "Inside this session", sessionCapabilities: "Next: 01 / PET INTAKE", sessionConnectedCopy: "The pet text and image below will be submitted as one Agent task input.", sessionVerifying: "Verifying the QR code and opening the session…", sessionConnected: "This Agent session is connected. Continue with pet intake below.", sessionQrInvalid: "This QR code is not a valid activity join code.", sessionQrExpired: "This QR code has expired. Please scan a new one.", sessionQrReadConnecting: "Activity QR read. Connecting automatically…",
-          qrManagerButton: "QR control desk", qrManagerStep: "EXHIBITOR QR", qrManagerTitle: "Exhibitor QR code", qrManagerDescription: "Choose an event, exhibitor, and booth to create a display QR code.", qrManagerInfo: "The QR code is generated locally. Its short-lived join token is not sent to a third-party QR service.", qrEvent: "Event", qrExhibitor: "Exhibitor", qrBooth: "Booth", qrCampaign: "Campaign", qrBaseUrl: "Visitor join URL", qrBaseUrlPlaceholder: "https://petfde.example/", generateQr: "Generate QR code", qrGenerating: "Generating…", qrPreviewEmpty: "Your QR code will appear here", qrResultTitle: "QR status", qrActive: "Active", qrGenerated: "QR code ready. Download the PNG or PDF asset.", qrServerError: "The QR service is not running. Start the local WebUI server first.", qrHistoryTitle: "Generated QR codes", downloadPng: "Download PNG", downloadPdf: "Download PDF", qrStatusMeta: "{exhibitor} · Booth {booth}<br />Expires {expires}", qrAdminAria: "Close QR manager"
+          qrManagerButton: "QR control desk", qrManagerStep: "EXHIBITOR QR", qrManagerTitle: "Exhibitor QR code", qrManagerDescription: "Choose an event, exhibitor, and booth to create a display QR code.", qrManagerInfo: "The QR code is generated locally. Its short-lived join token is not sent to a third-party QR service.", qrEvent: "Event", qrExhibitor: "Exhibitor", qrBooth: "Booth", qrCampaign: "Campaign", qrBaseUrl: "Visitor join URL", qrBaseUrlPlaceholder: "https://sayelf-pet-story-agent.example/", generateQr: "Generate QR code", qrGenerating: "Generating…", qrPreviewEmpty: "Your QR code will appear here", qrResultTitle: "QR status", qrActive: "Active", qrGenerated: "QR code ready. Download the PNG or PDF asset.", qrServerError: "The QR service is not running. Start the local WebUI server first.", qrHistoryTitle: "Generated QR codes", downloadPng: "Download PNG", downloadPdf: "Download PDF", qrStatusMeta: "{exhibitor} · Booth {booth}<br />Expires {expires}", qrAdminAria: "Close QR manager"
         }
       };
 
@@ -1020,7 +1020,7 @@
         if (!rawValue) return null;
         let candidate = String(rawValue).trim();
         try {
-          if (candidate.indexOf("petfde://") === 0) candidate = "https://petfde.local/" + candidate.slice("petfde://".length).replace(/^join\??/, "join?");
+          if (candidate.indexOf("sayelf-pet-story-agent://") === 0) candidate = "https://sayelf-pet-story-agent.local/" + candidate.slice("sayelf-pet-story-agent://".length).replace(/^join\??/, "join?");
           const url = new URL(candidate, window.location.href);
           const token = url.searchParams.get("join_token");
           const eventId = url.searchParams.get("event");

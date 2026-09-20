@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from pet_fde.domain.models import (
+from sayelf_pet_story_agent.domain.models import (
     GenerationAttempt,
     GenerationAttemptStatus,
     HallPlay,
@@ -14,10 +14,10 @@ from pet_fde.domain.models import (
     Video,
     VideoStatus,
 )
-from pet_fde.domain.state_machine import JobStateMachine, SessionStateMachine
-from pet_fde.fixtures.pilot_01 import PilotFixture, build_pilot_01
-from pet_fde.infrastructure.ledger import AppendOnlyEventLedger
-from pet_fde.providers.base import VideoGenerationRequest, VideoProviderAdapter
+from sayelf_pet_story_agent.domain.state_machine import JobStateMachine, SessionStateMachine
+from sayelf_pet_story_agent.fixtures.pilot_01 import PilotFixture, build_pilot_01
+from sayelf_pet_story_agent.infrastructure.ledger import AppendOnlyEventLedger
+from sayelf_pet_story_agent.providers.base import VideoGenerationRequest, VideoProviderAdapter
 
 
 @dataclass(frozen=True)

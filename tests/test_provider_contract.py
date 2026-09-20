@@ -1,8 +1,8 @@
 import unittest
 
-from pet_fde.providers.base import VideoGenerationRequest, VideoProviderAdapter
-from pet_fde.providers.fault import FaultVideoProvider
-from pet_fde.providers.mock import MockVideoProvider
+from sayelf_pet_story_agent.providers.base import VideoGenerationRequest, VideoProviderAdapter
+from sayelf_pet_story_agent.providers.fault import FaultVideoProvider
+from sayelf_pet_story_agent.providers.mock import MockVideoProvider
 
 
 def assert_provider_contract(test: unittest.TestCase, provider: VideoProviderAdapter, expected_success: bool) -> None:

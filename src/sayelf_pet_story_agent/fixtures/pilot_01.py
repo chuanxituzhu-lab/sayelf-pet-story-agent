@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from pet_fde.domain.models import (
+from sayelf_pet_story_agent.domain.models import (
     Campaign,
     Entry,
     EntrySource,

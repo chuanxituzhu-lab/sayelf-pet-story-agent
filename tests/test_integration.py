@@ -1,9 +1,9 @@
 import unittest
 
-from pet_fde.application.service import PilotService
-from pet_fde.infrastructure.ledger import AppendOnlyEventLedger
-from pet_fde.providers.fault import FaultVideoProvider
-from pet_fde.providers.mock import MockVideoProvider
+from sayelf_pet_story_agent.application.service import PilotService
+from sayelf_pet_story_agent.infrastructure.ledger import AppendOnlyEventLedger
+from sayelf_pet_story_agent.providers.fault import FaultVideoProvider
+from sayelf_pet_story_agent.providers.mock import MockVideoProvider
 
 
 class PilotIntegrationTests(unittest.TestCase):

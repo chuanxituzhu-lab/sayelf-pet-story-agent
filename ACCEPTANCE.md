@@ -4,7 +4,7 @@
 
 - Python: 3.14.5
 - Runtime dependencies: none
-- Scope: Pet FDE Build 0.1 / Sprint 01 only
+- Scope: sayelf-pet-story-agent Build 0.1 / Sprint 01 only
 
 ## Checks run
 
@@ -36,13 +36,13 @@ Command:
 
 ```text
 $env:PYTHONPATH = "src"
-python -m pet_fde
+python -m sayelf_pet_story_agent
 ```
 
 Result:
 
 ```text
-Pet FDE Pilot 01: READY
+sayelf-pet-story-agent Pilot 01: READY
 Event: Pet Expo Pilot 01
 Campaign: My Pet Movie
 Story shots: 8

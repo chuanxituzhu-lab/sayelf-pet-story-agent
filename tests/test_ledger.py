@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from pet_fde.infrastructure.ledger import AppendOnlyEventLedger
+from sayelf_pet_story_agent.infrastructure.ledger import AppendOnlyEventLedger
 
 
 class LedgerTests(unittest.TestCase):

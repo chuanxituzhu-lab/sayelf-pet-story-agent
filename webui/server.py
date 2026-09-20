@@ -1,4 +1,4 @@
-"""Local Pet FDE WebUI server with an exhibitor QR registry.
+"""Local sayelf-pet-story-agent WebUI server with an exhibitor QR registry.
 
 The server is intentionally local-first. QR payloads, generated assets and the
 small status registry stay on this machine. The frontend never sends QR data to
@@ -31,7 +31,7 @@ from reportlab.pdfgen import canvas
 ROOT = Path(__file__).resolve().parent
 ASSET_DIR = ROOT / ".local" / "qr_assets"
 REGISTRY_PATH = ROOT / ".local" / "qr_registry.json"
-QR_SECRET = os.environ.get("PET_FDE_QR_SECRET", "pet-fde-local-development-secret").encode("utf-8")
+QR_SECRET = os.environ.get("SAYELF_PET_STORY_AGENT_QR_SECRET", "sayelf-pet-story-agent-local-development-secret").encode("utf-8")
 
 PILOT_OPTIONS = {
     "events": [{"id": "event-pilot-01", "name": "Pet Expo Pilot 01"}],
@@ -96,12 +96,12 @@ def make_qr_pdf(record: dict, png: bytes) -> bytes:
     output = BytesIO()
     page_width, page_height = A4
     pdf = canvas.Canvas(output, pagesize=A4)
-    pdf.setTitle(f"Pet FDE QR - {record['booth_code']}")
+    pdf.setTitle(f"sayelf-pet-story-agent QR - {record['booth_code']}")
     pdf.setFillColorRGB(0.04, 0.07, 0.13)
     pdf.rect(0, 0, page_width, page_height, fill=1, stroke=0)
     pdf.setFillColorRGB(0.60, 0.96, 0.78)
     pdf.setFont("Helvetica-Bold", 25)
-    pdf.drawString(48, page_height - 72, "Pet FDE")
+    pdf.drawString(48, page_height - 72, "sayelf-pet-story-agent")
     pdf.setFillColorRGB(0.92, 0.95, 0.98)
     pdf.setFont("Helvetica-Bold", 20)
     pdf.drawString(48, page_height - 112, record["event_name"])
@@ -153,12 +153,12 @@ def public_record(record: dict) -> dict:
     }
 
 
-class PetFDEHandler(SimpleHTTPRequestHandler):
+class SayelfPetStoryAgentHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(ROOT), **kwargs)
 
     def log_message(self, format: str, *args) -> None:
-        print(f"[pet-fde] {format % args}")
+        print(f"[sayelf-pet-story-agent] {format % args}")
 
     def send_json(self, payload: dict, status: int = 200) -> None:
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
@@ -268,14 +268,14 @@ class PetFDEHandler(SimpleHTTPRequestHandler):
 
 
 def main() -> None:
-    port = int(os.environ.get("PET_FDE_WEBUI_PORT", "8080"))
-    server = ThreadingHTTPServer(("127.0.0.1", port), PetFDEHandler)
-    print(f"Pet FDE WebUI: http://localhost:{port}/")
+    port = int(os.environ.get("SAYELF_PET_STORY_AGENT_WEBUI_PORT", "8080"))
+    server = ThreadingHTTPServer(("127.0.0.1", port), SayelfPetStoryAgentHandler)
+    print(f"sayelf-pet-story-agent WebUI: http://localhost:{port}/")
     print("QR registry: local-only")
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print("\nPet FDE WebUI stopped")
+        print("\nsayelf-pet-story-agent WebUI stopped")
     finally:
         server.server_close()
 
